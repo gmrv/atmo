@@ -1,0 +1,29 @@
+version: '2'
+services:
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=***
+      - POSTGRES_DB=***
+    volumes:
+      - atmo_data:/var/lib/postgresql/data
+  django:
+    build:
+      context: .
+      dockerfile: Dockerfile-atmo
+    ports:
+      - "80:8000"
+    volumes:
+      - atmo_files:/webapp/storage
+    depends_on:
+      - db
+    links:
+      - db
+volumes:
+  atmo_files:
+  atmo_data:

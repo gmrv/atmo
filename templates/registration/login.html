@@ -1,0 +1,86 @@
+{% load static %}
+{% load i18n %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+	{% block style %}<style></style>{% endblock %}
+
+	{% block scripts %}
+	<script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+	<!-- Compiled and minified CSS -->
+	<link rel="stylesheet" href="{% static 'css/materialize.min.css' %}" />
+	<link rel="stylesheet" href="{% static 'css/atmo.css' %}" />
+	<!-- Compiled and minified JavaScript -->
+	<script src="{% static 'js/materialize.min.js' %}"></script>
+	<!-- Fonts are fun -->
+	<link href="{% static 'fonts/roboto/Roboto-Regular.eot' %}" rel="stylesheet">
+	{% endblock %}
+
+</head>
+<body>
+{% block content %}
+
+	{% if form.errors %}
+		<p class='error'>{% blocktrans %}Your username and password didn't match. Please try again.{% endblocktrans %}</p>
+	{% endif %}
+
+	<form id='login_form'  method="post" action=".">
+		<div class="container" id='login_box'>
+			<div class="row center-align">
+        <h2 id='login_header'>АТМОСФЕРА</h2>
+      </div>
+			<div class="row wide">
+				<div class="col s12">{{ form.username }}</div>
+			</div>
+			<div class="row wide">
+				<div class="col s12">{{ form.password }}</div>
+			</div>
+			<div class="row wide">
+				<div class="col s12">
+					<button id='loginonly-btn' type="submit" value="Login" class="waves-effect waves-light btn">Войти</button>
+				</div>
+				<input type="hidden" name="next" value="{{ next }}" />
+			</div>
+			{% csrf_token %}
+		</div>
+	</form>
+
+{% endblock %}
+
+{% block extrajs %}
+	<script>
+		//$(document).ready(function() {
+			$('#id_username')[0].placeholder = "E-mail";
+			$('#id_password')[0].placeholder = "Пароль";
+
+			$('#reg_box').hide();
+			//$('.button-collapse').sideNav();
+			// $('#login_box').show();
+
+			$('#reg_link').on('click', function(e) {
+				e.preventDefault();
+
+				$('#login_box').hide();
+				$('#reg_box').show();
+			});
+
+			$('#login_link').on('click', function(e) {
+				e.preventDefault();
+
+				$('#reg_box').hide();
+				$('#login_box').show();
+			})
+
+			$('.error').css('color', 'red');
+			$('.error').css('font-style', 'italic');
+			$('.error').css('text-align', 'center');
+		 //})
+	</script>
+{% endblock %}
+</body>
+</html>

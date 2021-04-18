@@ -1,0 +1,168 @@
+@startuml
+!define table(x) class x << (T,yellow) >>
+!define table_new(X) class x << (T,green) >>
+!define table_upd(x) class x << (T,#FF0000) >>
+!define primary_key(x) <b><u>x</u></b>
+!define attention(x) <color:red><b>x</b></color>
+!define not_null(x) <b>x</b>
+!define maybe(x) <color:gray>x</color>
+hide methods
+hide stereotypes
+
+'todo:
+' Шедулинг
+' Кто сегодня в коворкинге, возможно на основе Booking.confirmed
+
+'Компания
+'Вершина иерархии, текущий владелец проекта
+table(Company){
+    primary_key(id)
+    not_null(name)
+    not_null(short_name)
+    not_null(full_name)
+    not_null(code)
+    not_null(root_dir)
+    owner
+    areas [1..*]
+}
+
+'Площадки (Коворкинги)
+table(Area){
+    primary_key(id)
+    not_null(name)
+    not_null(type)
+    map_url
+    resources [1..*]
+}
+
+'Типы площадок
+'Пока нет понимания что за типы.
+'Добавлено на развитие
+table(AreaType){
+    primary_key(id)
+    not_null(name)
+}
+
+'Ресурсы
+'см. Типы ресурсов
+table(Resource){
+    primary_key(id)
+    not_null(name)
+    not_null(type)
+}
+
+'Типы ресурсов
+'Переговорка, рабочее место, парковочное место, локкер и т.д.
+'Еще могут быть приватные ресурсы, личное рабочее место
+table(ResourceType){
+    primary_key(id)
+    not_null(name)
+}
+
+'Свойства ресурса
+'Например для переговорки это может быть наличие проектора
+'name: Проектор; type: bool; value_bool: True
+table(Property){
+    primary_key(id)
+    not_null(name)
+    not_null(type)
+    value_bool
+    value_real
+    value_int
+    value_text
+}
+
+'Записи о бронировании ресурсов
+' confirmed         - подтверждение бронирования
+' confirmed_at      - когда подтверждено
+' confirmed_by      - кем подтверждено
+' confirmation_pin  - пин-код который надо ввести для подтверждения
+table(Booking){
+    primary_key(id)
+    not_null(name)
+    not_null(created_at)
+    not_null(created_by)
+    not_null(resource)
+    not_null(user)
+    not_null(begin)
+    not_null(end)
+    confirmed
+    confirmed_at
+    confirmed_by
+    confirmation_pin
+    event
+}
+
+'Событие всязанное с бронированием
+'Актуально только для переговорок (пока)
+table(Event){
+    primary_key(id)
+    not_null(name)
+    description
+    users [1..*]
+}
+
+'Запросы пользователей к администрации коворкинга
+' resource - Ресурс к которому привязан запрос. Пока предполагается что в основном это будет забронированное место.
+' user - ползователь сгенерировавший запрос
+' message - тело запроса
+' active - активный или отработанный запрос
+table(Request){
+    primary_key(id)
+    not_null(created_at)
+    not_null(created_by)
+    not_null(resource)
+    not_null(message)
+    active
+}
+
+' Дополнительная информация о пользователе
+table(ExtUser){
+    primary_key(id)
+    not_null(middle_name)
+    not_null(company)
+}
+
+' Массовые сообщения для пользователей
+table(Notification){
+    primary_key(id)
+    not_null(message)
+    not_null(start)
+    not_null(end)
+    not_null(user_group)
+    active
+}
+
+table(DjangoUser){
+}
+
+
+Company *-- "1..*" Area
+Area *-- "1..*" Resource
+Area -- AreaType
+Resource -- ResourceType
+Resource *-- "0..*" Property
+Booking -- DjangoUser
+Booking -- Resource
+Booking -- "0..1" Event
+Event -- "1..*" DjangoUser
+Request -- DjangoUser
+Request -- Resource
+DjangoUser *-- "1..1" ExtUser
+
+/'
+object Legend {
+    Company: Справочник предприятий, а также вершина иерархии, текущий владелец проекта
+    Area : Коворкинги
+    Resource: Ресурсы доступные в рамкках коворкинга (переговорки, места и т.п.)
+    ResourceType: Тип ресурса (переговорки, места и т.п.)
+    Property: Свойства ресурса (есть ли в переговорной проектор)
+    Booking: Таблица бронирования ресурсов
+    Event: Событие связанное с бронированием. Например для переговорок описание собрания
+    Request: Запрос пользователя к администрации коворкингда. Например на уборку места
+    UserProfile: Подробная информация о пользователе
+    Notification: Широковещательное сообщения для всех пользователей или групп
+
+}
+'/
+@enduml

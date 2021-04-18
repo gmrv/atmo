@@ -1,0 +1,99 @@
+{% load settings_value %}
+{% load static  %}
+{% load i18n %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <meta name="DC.title" content="{% settings_value 'SITE_NAME' %}" />
+  <title>{% block title %}{% settings_value 'SITE_NAME' %}{% endblock %} | {% block sub-title %}{% endblock %}</title>
+  <link rel="shortcut icon" href="{%  static 'img/favicon.ico' %}">
+
+  {% block scripts %}
+    <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'js/jquery-ui-1.12.1.min.js' %}"></script>
+    <script src="{% static 'js/jquery-ui-1.12.1.min.js' %}"></script>
+
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="{% static 'css/materialize.css' %}">
+    <link rel="stylesheet" href="{% static 'css/atmo.css' %}">
+
+    <!-- Compiled and minified JavaScript -->
+    <script src="{% static 'js/materialize.js' %}"></script>
+    <script src="{% static 'js/atmo.js' %}"></script>
+
+    <!-- Fonts are fun -->
+    <link href="{% static 'fonts/roboto/Roboto-Regular.eot' %}" rel="stylesheet">
+
+  {% endblock %}
+
+
+  {% block pagestyle %}{% endblock %}
+
+  {% if not request.user.is_staff %}
+    <script>
+        // web counters here
+    </script>
+  {% endif %}
+
+  {%block sub-head %}{% endblock %}
+
+<!--  {% block style %}{% endblock %}-->
+  <style>
+  </style>
+</head>
+
+<body>
+  {% block body %}
+    {% block top_div %}{% endblock %}
+
+    <!-- Page  -->
+    {% block top_nav %}
+    {% endblock %}
+
+    {% if request.user.profile.is_active %}
+      {% if integrations.slack %}
+      {% endif %}
+          {% if request.user.is_staff %}
+          {% endif %}
+    {% else %}
+      {% if integrations.slack %}
+      {% endif %}
+          {% if request.user.is_staff %}
+          {% endif %}
+    {% endif %}
+
+    {% block side-nav %}
+        {% if request.user.profile.is_active %}
+          {% if integrations.slack %}
+          {% endif %}
+        {% else %}
+          {% if integrations.slack %}
+          {% endif %}
+        {% endif %}
+    {% endblock %}
+
+    {% block lower_nav %}{% endblock %}
+
+    {% block main_body %}
+      {% block content %}{% endblock %}
+    {% endblock %}
+
+    {% block floating_content %}{% endblock %}
+
+    {% block bottom_div %}{% endblock %}
+
+  {% endblock %} <!-- block body-->
+
+  <script>
+    $(document).ready(function() {});
+  </script>
+
+  {% block extrajs %}
+  {% endblock %}
+
+</body>
+</html>

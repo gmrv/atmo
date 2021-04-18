@@ -1,0 +1,47 @@
+############################################################
+# Dockerfile to run a Django-based web application
+# Based on an Ubuntu Image
+############################################################
+
+FROM python:3.9
+
+# Set the file maintainer (your name - the file's author)
+MAINTAINER gmrv
+
+# Don't buffer stdout and stderr
+ENV PYTHONUNBUFFERED 1
+
+# Set env variables used in this Dockerfile (add a unique prefix, such as DOCKYARD)
+# Local directory with project source
+ENV DOCKYARD_SRC=./
+
+# Directory in container for all project files
+ENV DOCKYARD_SRVHOME=/webapp
+
+# Directory in container for project source files
+ENV DOCKYARD_SRVPROJ=/webapp/atmo
+
+# Update the default application repository sources list
+RUN apt-get update \
+    && apt-get -y dist-upgrade \
+    && apt-get install -y postgresql-client nano
+
+# Create application subdirectories
+WORKDIR $DOCKYARD_SRVHOME
+RUN mkdir media static logs storage
+VOLUME ["$DOCKYARD_SRVHOME/media/", "$DOCKYARD_SRVHOME/logs/"]
+
+# Copy application source code to SRCDIR
+COPY $DOCKYARD_SRC $DOCKYARD_SRVPROJ
+RUN rm -rf $DOCKYARD_SRVPROJ/.idea
+
+# Install Python dependencies
+RUN pip install --upgrade pip
+RUN pip install -r $DOCKYARD_SRVPROJ/requirements.txt
+
+# Port to expose
+EXPOSE 8000
+
+WORKDIR $DOCKYARD_SRVPROJ
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000", "--insecure"]
+#CMD ["tail", "-f", "/dev/null"]
