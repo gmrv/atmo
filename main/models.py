@@ -2,6 +2,11 @@ from django.db import models
 from django.contrib.auth.models import User, Group
 from main.utils import get_pin
 
+# todo: Try
+# class Resource(Common)
+# class Room(Resource)
+# class Seat(Resource)
+
 
 class Common(models.Model):
     name = models.CharField(help_text='Наименование', max_length=250)
@@ -11,9 +16,6 @@ class Common(models.Model):
 
     class Meta:
         abstract = True
-
-
-
 
 
 # Компания которой пренадлежат площадки
@@ -118,6 +120,7 @@ class ExtUser(User):
     middle_name = models.CharField(help_text='Отчество', max_length=500)
     company = models.ForeignKey(Company, help_text='Компания', on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
     active = models.BooleanField(blank=True, default=True)
+    def_area = models.ForeignKey(Area, help_text='Площадка по умолчанию', on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
 
 
 # Массовые сообщения для пользователей

@@ -6,10 +6,49 @@
 {% block style %}{% endblock %}
 
 {% block content %}
-  <div>контент</div>
+    <div class="container">
+
+
+      <div class="row">
+
+        <div class="col s3">Площадка:</div>
+        <div class="col s9">{{ area }}</div>
+
+      </div>
+
+
+      <div class="row">
+
+        <div class="col s3">Места:</div>
+
+        <div class="col s9">
+              {% for s in seats %}
+                {{ s.name }};&nbsp;
+              {% endfor %}
+        </div>
+
+      </div>
+
+
+      <div class="row">
+
+        <div class="col s3">Переговорные комнаты:</div>
+
+        <div class="col s9">
+              {% for r in rooms %}
+                {{ r.name }} ({{ r.seats }});&nbsp;
+              {% endfor %}
+        </div>
+
+      </div>
+
+    </div>
+
+
+
 {% endblock %}
 
-{% block floating_content %}<div>фк</div>{% endblock %}
+{% block floating_content %}{% endblock %}
 
 {% block extrajs %}
   <script>

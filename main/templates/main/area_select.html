@@ -1,0 +1,50 @@
+{% extends 'main/base.html' %}
+{% load static %}
+{% load i18n %}
+{% block sub-title %}Добро пожаловать{% endblock %}
+
+{% block style %}{% endblock %}
+
+{% block content %}
+  <div class="container">
+
+		<form id="id-area-form" name="id-area-form" class='' method="POST" action=".">
+
+      <div class="row">
+
+        <div class="col s6">
+          <div class="input-field col s6">
+            <select id="id-select-area" name="id-select-area">
+              <option value="" disabled selected>Выберите площадку</option>
+              {% for a in areas %}
+                <option value="{{ a.id }}">{{ a.name }}</option>
+              {% endfor %}
+            </select>
+            <label>Площадки доступные в рамках вашего предприятия</label>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="row">
+
+        <div class="col s6"><a class="waves-effect waves-light btn" onclick="$('#id-area-form').submit()">Выбрать</a></div>
+
+      </div>
+
+      {% csrf_token %}
+
+      </form>
+  </div>
+
+
+
+
+{% endblock %}
+
+{% block floating_content %}{% endblock %}
+
+{% block extrajs %}
+  <script>
+  </script>
+{% endblock %}

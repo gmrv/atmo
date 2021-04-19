@@ -32,10 +32,25 @@ html {
 
 body {
   line-height: 1;
-  background-color: #90CAF9;
+  background-color: white;
   height: 100%;
 }
 
 a:hover {
   cursor: pointer;
+}
+
+/*Materialize*/
+
+
+.row .col {
+    padding: 0 0;
+}
+
+.input-field.col label {
+    left: 0;
+}
+
+nav {
+    margin-bottom: 1vh;
 }

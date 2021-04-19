@@ -52,6 +52,15 @@
 
     <!-- Page  -->
     {% block top_nav %}
+      <nav>
+        <div class="nav-wrapper">
+          <a href="#" class="brand-logo right">Logo</a>
+          <ul id="nav-mobile" class="left hide-on-med-and-down">
+            <li><a href="/main/area_select">Площадки</a></li>
+            <li><a href="/logout">Выход</a></li>
+          </ul>
+        </div>
+      </nav>
     {% endblock %}
 
     {% if request.user.profile.is_active %}
@@ -89,7 +98,10 @@
   {% endblock %} <!-- block body-->
 
   <script>
-    $(document).ready(function() {});
+    $(document).ready(function() {
+      $('select').formSelect();
+      $('.sidenav').sidenav();
+    });
   </script>
 
   {% block extrajs %}
