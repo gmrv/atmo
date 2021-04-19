@@ -13,5 +13,6 @@ urlpatterns = [
 
     # path('', RedirectView.as_view(url='/main/home', permanent=True)),
     path('', root_views.root, name='root'),
-    path('main/', include(('main.urls', 'main'), namespace='main'))
+    path('main/', include(('main.urls', 'main'), namespace='main')),
+    path('api/', include(('api.urls', 'api'), namespace='api'))
 ]

@@ -1,7 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User, Group
-
-from main.models.resource import *
 from main.utils import get_pin
 
 

@@ -97,10 +97,28 @@
 
   {% endblock %} <!-- block body-->
 
+  {% csrf_token %}
+
   <script>
+    isDebug = true
+
     $(document).ready(function() {
       $('select').formSelect();
       $('.sidenav').sidenav();
+
+      let csrftoken = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+
+      // Подключаем токен для пост запросов
+      $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                // Only send the token to relative URLs i.e. locally.
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+      });
+
+
     });
   </script>
 

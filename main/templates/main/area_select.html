@@ -16,9 +16,6 @@
           <div class="input-field col s6">
             <select id="id-select-area" name="id-select-area">
               <option value="" disabled selected>Выберите площадку</option>
-              {% for a in areas %}
-                <option value="{{ a.id }}">{{ a.name }}</option>
-              {% endfor %}
             </select>
             <label>Площадки доступные в рамках вашего предприятия</label>
           </div>
@@ -28,7 +25,7 @@
 
       <div class="row">
 
-        <div class="col s6"><a class="waves-effect waves-light btn" onclick="$('#id-area-form').submit()">Выбрать</a></div>
+        <div class="col s6"><a id="id-select-area-button" name="id-select-area-button" class="waves-effect waves-light btn" disabled>Выбрать</a></div>
 
       </div>
 
@@ -46,5 +43,36 @@
 
 {% block extrajs %}
   <script>
+    $(document).ready(function(){
+      ajget('/api/get_available_areas', fillDropdown, null)
+
+      // Разблокируем кнопку отправки
+      $('#id-select-area').on('change', function(){
+        $('#id-select-area-button').removeAttr('disabled')
+      })
+
+      $('#id-select-area-button').on('click', function(){
+        let areaId = $( "#id-select-area option:selected" ).val()
+        ajget('/api/set_default_area/' + areaId, redirectToHome, null)
+      })
+
+    });
+
+    // Заполнение выпадающего списка площадок
+    function fillDropdown(response){
+      let result = response.result;
+      let dropdown = $("#id-select-area");
+      $.each(result, function() {
+        dropdown.append($("<option />").val(this.id).text(this.name));
+      });
+
+      // Перерисовка дропдаунов от Materialize
+      $('select').formSelect();
+    }
+
+    function redirectToHome(){
+      window.location.href = '/main/home';
+    }
+
   </script>
 {% endblock %}
