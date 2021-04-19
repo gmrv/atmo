@@ -48,49 +48,29 @@ class Area(Common):
         return ("%s::%s (id: %s);"  % (self.type, self.name, self.id))
 
 
-# Типы ресурсов
-# Переговорка, рабочее место, парковочное место, локкер и т.д.
-# Еще могут быть приватные ресурсы, личное рабочее место
-class ResourceType(Common):
-    pass
-
-    def __str__(self):
-        return (self.name)
-
-
-# Ресурсы
-# см. Типы ресурсов
 class Resource(Common):
-    type = models.ForeignKey(ResourceType, help_text='Тип ресурса',
-                             on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
     area = models.ForeignKey(Area, help_text='Родительская площадка',
                                   on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
 
-    def __str__(self):
-        return ("Id: %s; Type: %s; Name: %s;" % (self.id, self.type, self.name))
-
-
-# Свойства ресурса
-# Например для переговорки это может быть наличие проектора
-# name: Наличие проектора; type: bool; value_bool: True
-class Property(Common):
-    BOOL = 'bool'
-    REAL = 'real'
-    TEXT = 'text'
-    PROPERTY_TYPE_CHOICES = (
-        (BOOL, 'Булево'),
-        (REAL, 'Число'),
-        (TEXT, 'Строка'),
-    )
-    resource = models.ForeignKey(Resource, help_text='Родительский ресурс', on_delete=models.deletion.CASCADE,
-                                 blank=True, null=True, default=None)
-    type = models.CharField(help_text='Тип поля', choices=PROPERTY_TYPE_CHOICES, max_length=4)
-    value_bool = models.BooleanField(blank=True, default=False)
-    value_real = models.DecimalField(blank=True, null=True, max_digits=11, decimal_places=2)
-    value_text = models.CharField(blank=True, null=True, max_length=250)
+    @property
+    def type(self):
+        if hasattr(self, 'room'):
+            return 'room'
+        if hasattr(self, 'seat'):
+            return 'seat'
+        return 'resource'
 
     def __str__(self):
-        return ("%s %s::%s;" % (self.resource.type, self.resource.name, self.name))
+        return ("Id: %s; Type: %s; Name: %s;" % (self.id, type, self.name))
+
+
+class Room(Resource):
+    capacity = models.SmallIntegerField(help_text= 'Количество сидячих мест', default=0)
+
+
+class Seat(Resource):
+    persisted = models.BooleanField(help_text= 'Постоянное место', blank=True, default=False)
+    owner = models.ForeignKey(User, help_text= 'За кем закреплено', on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
 
 
 # Событие всязанное с бронированием

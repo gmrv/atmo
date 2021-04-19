@@ -19,8 +19,6 @@ class Command(BaseCommand):
         self.delete_all(Area)
         self.delete_all(AreaType)
         self.delete_all(Resource)
-        self.delete_all(ResourceType)
-        self.delete_all(Property)
         self.delete_all(Group)
         self.delete_all(User)
         self.delete_all(ExtUser)

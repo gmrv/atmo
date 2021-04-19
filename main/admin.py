@@ -5,8 +5,6 @@ from main.models import *
 
 admin.site.register(Area)
 admin.site.register(AreaType)
-admin.site.register(ResourceType)
-admin.site.register(Property)
 admin.site.register(Resource)
 admin.site.register(Company)
 admin.site.register(Request)

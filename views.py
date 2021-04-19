@@ -9,6 +9,7 @@ from main.models import *
 @login_required
 def check_def_area(request):
     user = request.user.extuser
+
     if user.def_area:
         return HttpResponseRedirect(reverse('main:home'))
     else:

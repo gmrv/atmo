@@ -16,25 +16,19 @@ class Command(BaseCommand):
         area_type_coworking = AreaType.objects.create(name='Коворкинг')
         area_type_floor = AreaType.objects.create(name='Этаж')
 
-        # Типы ресурсов
-        resource_type_room = ResourceType.objects.create(name="Переговорная")
-        resource_type_seat = ResourceType.objects.create(name="Место")
-
-
         # Объекты
 
         cos = Company.objects.create(name="АО \"Fossa\"", short_name="АО \"Fossa\"", full_name="АО \"Fossa\"")
 
-        m1 = Resource.objects.create(type=resource_type_seat, name="01")
-        Property.objects.create(type=Property.BOOL, name="Постоянное", value_bool=True, resource=m1)
-
         a = Area.objects.create(name="Fossa Коворкинг №1", type=area_type_coworking)
-        a.resource_set.add(m1)
+
+        for n in range(1, 21):
+            m = Seat.objects.create(name=str(n).zfill(2))
+            a.resource_set.add(m)
         a.save()
 
-        for n in range(2, 21):
-            m = Resource.objects.create(type=resource_type_seat, name=str(n).zfill(2))
-            a.resource_set.add(m)
+        r = Room.objects.create(name='Fossa Переговорная №1', capacity=20)
+        a.resource_set.add(r)
         a.save()
 
         cos.area_set.add(a)
@@ -42,7 +36,7 @@ class Command(BaseCommand):
 
         a = Area.objects.create(name="Fossa Коворкинг №2", type=area_type_coworking)
         for n in range(1, 11):
-            m = Resource.objects.create(type=resource_type_seat, name=str(n).zfill(2))
+            m = Seat.objects.create(name=str(n).zfill(2))
             a.resource_set.add(m)
         a.save()
 
@@ -54,7 +48,7 @@ class Command(BaseCommand):
 
         a = Area.objects.create(name="Beaver Коворкинг №1", type=area_type_coworking)
         for n in range(1, 21):
-            m = Resource.objects.create(type=resource_type_seat, name=str(n).zfill(2))
+            m = Seat.objects.create(name=str(n).zfill(2))
             a.resource_set.add(m)
         a.save()
 
@@ -63,7 +57,7 @@ class Command(BaseCommand):
 
         a = Area.objects.create(name="Beaver Коворкинг №2", type=area_type_coworking)
         for n in range(1, 11):
-            m = Resource.objects.create(type=resource_type_seat, name=str(n).zfill(2))
+            m = Seat.objects.create(name=str(n).zfill(2))
             a.resource_set.add(m)
         a.save()
 
@@ -77,6 +71,11 @@ class Command(BaseCommand):
             first_name="Иван", middle_name="Иванович", last_name="Иванов")
         u.set_password("1234")
         u.save()
+
+        r = u.company.area_set.get(pk=1).resource_set.get(name='01')
+        r.seat.persisted = True
+        r.seat.owner = u
+        r.save()
 
         u = ExtUser.objects.create(username="petrov-pp", email="petrov-pp@a.com", company=cos,
             first_name="Петор", middle_name="Пертрович", last_name="Петров")

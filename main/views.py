@@ -12,16 +12,15 @@ def index(request):
 @login_required
 def home(request):
     user = request.user.extuser
-    seats_query = Resource.objects.filter(type=ResourceType.objects.get(name='Место'), area=user.def_area)
+    seats_query = Seat.objects.filter(area=user.def_area)
     seats = []
     for s in seats_query:
         seats.append({"id": s.id, "name": s.name})
 
-    rooms_query = Resource.objects.filter(type=ResourceType.objects.get(name='Переговорная'), area=user.def_area)
+    rooms_query = Room.objects.filter(area=user.def_area)
     rooms = []
     for r in rooms_query:
-        # todo: save query r.property_set.get(name='Мест').value_real
-        rooms.append({"id": r.id, "name": r.name, "seats": r.property_set.get(name='Мест').value_real })
+        rooms.append({"id": r.id, "name": r.name, "seats": r.capacity })
 
     context = {
         'area': user.def_area.name,
