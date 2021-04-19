@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from main.models import *
+from main.models.core import *
 
 admin.site.register(Area)
 admin.site.register(AreaType)

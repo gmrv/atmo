@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from main.models import *
+from main.models.core import *
 from django.db import connection
 
 

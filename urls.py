@@ -12,6 +12,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # path('', RedirectView.as_view(url='/main/home', permanent=True)),
-    path('', root_views.check_def_area, name='check_def_area'),
+    path('', root_views.root, name='root'),
     path('main/', include(('main.urls', 'main'), namespace='main'))
 ]

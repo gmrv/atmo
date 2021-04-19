@@ -1,11 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User, Group
-from main.utils import get_pin
 
-# todo: Try
-# class Resource(Common)
-# class Room(Resource)
-# class Seat(Resource)
+from main.models.resource import *
+from main.utils import get_pin
 
 
 class Common(models.Model):
@@ -48,6 +45,23 @@ class Area(Common):
         return ("%s::%s (id: %s);"  % (self.type, self.name, self.id))
 
 
+# Дополнительная информация о пользователе
+class ExtUser(User):
+    middle_name = models.CharField(help_text='Отчество', max_length=500)
+    company = models.ForeignKey(Company, help_text='Компания', on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
+    active = models.BooleanField(blank=True, default=True)
+    def_area = models.ForeignKey(Area, help_text='Площадка по умолчанию', on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
+
+
+# Массовые сообщения для пользователей
+class Notification(Common):
+    message = models.CharField(help_text='Сообщение', max_length=500)
+    start = models.DateTimeField(help_text='Начало брони', blank=True)
+    finish = models.DateTimeField(help_text='Окончание брони', blank=True)
+    users_group = models.ForeignKey(Group, help_text= 'Группа', on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
+    active = models.BooleanField(blank=True, default=True)
+
+# Ресурсы
 class Resource(Common):
     area = models.ForeignKey(Area, help_text='Родительская площадка',
                                   on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
@@ -63,15 +77,14 @@ class Resource(Common):
     def __str__(self):
         return ("Id: %s; Type: %s; Name: %s;" % (self.id, type, self.name))
 
-
+# Переговорные
 class Room(Resource):
     capacity = models.SmallIntegerField(help_text= 'Количество сидячих мест', default=0)
 
-
+# Рабочие места
 class Seat(Resource):
     persisted = models.BooleanField(help_text= 'Постоянное место', blank=True, default=False)
     owner = models.ForeignKey(User, help_text= 'За кем закреплено', on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
-
 
 # Событие всязанное с бронированием
 # Например: Ежедневная планерка
@@ -94,24 +107,6 @@ class Request(Common):
     active = models.BooleanField(blank=True, default=True)
 
 
-# Дополнительная информация о пользователе
-# todo: Разобраться
-class ExtUser(User):
-    middle_name = models.CharField(help_text='Отчество', max_length=500)
-    company = models.ForeignKey(Company, help_text='Компания', on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
-    active = models.BooleanField(blank=True, default=True)
-    def_area = models.ForeignKey(Area, help_text='Площадка по умолчанию', on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
-
-
-# Массовые сообщения для пользователей
-class Notification(Common):
-    message = models.CharField(help_text='Сообщение', max_length=500)
-    start = models.DateTimeField(help_text='Начало брони', blank=True)
-    finish = models.DateTimeField(help_text='Окончание брони', blank=True)
-    users_group = models.ForeignKey(Group, help_text= 'Группа', on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
-    active = models.BooleanField(blank=True, default=True)
-
-
 # Записи о бронировании ресурсов
 #  confirmed         - подтверждение бронирования
 #  confirmed_at      - когда подтверждено
@@ -124,10 +119,10 @@ class Booking(Common):
     changed_at = models.DateTimeField(help_text='Время изменения', auto_now=True)
     changed_by = models.CharField(help_text= 'Кем изменено', max_length=50, null=False, default='')
     resource = models.ForeignKey(Resource, help_text= 'Объект бронирования', on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
-    user = models.ForeignKey(User, help_text= 'Бронирующий', on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
-    start = models.DateTimeField(help_text='Начало брони', blank=True)
-    finish = models.DateTimeField(help_text='Окончание брони', blank=True)
-    confirmed = models.BooleanField(blank=True, default=False)
+    user = models.ForeignKey(User, help_text= 'Бронирующий', on_delete=models.deletion.CASCADE, blank=False, null=True, default=None)
+    start = models.DateTimeField(help_text='Начало брони', blank=False)
+    finish = models.DateTimeField(help_text='Окончание брони', blank=False)
+    confirmed = models.BooleanField(help_text='Подтверждение брони', blank=True, default=False)
     confirmed_at = models.DateTimeField(help_text='Время изменения')
     confirmed_by = models.CharField(help_text= 'Кем подтверждено', max_length=50, null=False, default='')
     confirmation_pin = models.PositiveSmallIntegerField(help_text= 'PIN-код', default=get_pin)

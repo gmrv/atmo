@@ -1,13 +1,10 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.urls import reverse
-
-from main.models import *
 
 
 @login_required
-def check_def_area(request):
+def root(request):
     user = request.user.extuser
 
     if user.def_area:
