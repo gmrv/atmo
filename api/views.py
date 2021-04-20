@@ -9,17 +9,34 @@ from main.models.core import *
 def index(request):
     return HttpResponseRedirect(reverse('api:home'))
 
+
 @login_required
 def home(request):
-    return HttpResponse('home')
+    return HttpResponse('<a href="/admin/doc/views/#ns|api">Документация модуля</a>')
+
 
 @login_required
 def get_info(request):
+    """
+    Тестирование документации
+
+    **Контекст**
+
+    ``моямодель``
+        Интерфейс для :model:`myapp.MyModel`.
+
+    **Темплейт:**
+
+    :template:`myapp/my_template.html`
+    """
     return HttpResponse('info')
 
-# Получить список доступных площадок для пользователя
+
 @login_required
 def get_available_areas(request, username=None):
+    """
+    Получить список доступных площадок для пользователя
+    """
     if username:
         xuser = ExtUser.objects.get(username=username)
     else:
@@ -33,9 +50,12 @@ def get_available_areas(request, username=None):
     response = get_response_template(code='ok', source=request.path, result=areas)
     return JsonResponse( response, safe=False)
 
-# Установить площадку по умолчанию для пользователя
+
 @login_required
 def set_default_area(request, area_id, username=None):
+    """
+    Установить площадку по умолчанию для пользователя
+    """
     if username:
         xuser = ExtUser.objects.get(username=username)
     else:

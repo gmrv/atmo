@@ -46,11 +46,12 @@
     $(document).ready(function(){
       ajget('/api/get_available_areas', fillDropdown, null)
 
-      // Разблокируем кнопку отправки
+      // Обработка выбора площадки
       $('#id-select-area').on('change', function(){
         $('#id-select-area-button').removeAttr('disabled')
       })
 
+      // Выбор площадки, переход на домашнюю страницу
       $('#id-select-area-button').on('click', function(){
         let areaId = $( "#id-select-area option:selected" ).val()
         ajget('/api/set_default_area/' + areaId, redirectToHome, null)
