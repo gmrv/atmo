@@ -77,3 +77,7 @@ class Command(BaseCommand):
             first_name="Петор", middle_name="Пертрович", last_name="Петров")
         u.set_password("1234")
         u.save()
+
+        u = ExtUser.objects.create(username="root", is_staff=True, is_superuser=True)
+        u.set_password("1234")
+        u.save()

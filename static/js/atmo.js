@@ -20,6 +20,7 @@ function ajget(url, fn_ondone=function(){}, params=[]){
     }
   })
   .done(function (resp) {
+    log("response with:");
     log(resp);
     fn_ondone(resp, params)
   });
