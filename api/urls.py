@@ -16,5 +16,8 @@ urlpatterns = [
     path('set_default_area/<int:area_id>/', views.set_default_area, name='get_available_areas'),
     path('set_default_area/<int:area_id>/<str:username>', views.set_default_area, name='get_available_areas'),
 
+    #
+    path('get_area_resource_list/<int:area_id>/<str:resource_type>/', views.get_area_resource_list, name='get_area_resource_list'),
+
 
 ]
