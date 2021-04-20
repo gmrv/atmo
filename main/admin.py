@@ -4,7 +4,6 @@ from django.contrib import admin
 from main.models.core import *
 
 admin.site.register(Area)
-admin.site.register(AreaType)
 admin.site.register(Resource)
 admin.site.register(Company)
 admin.site.register(Request)

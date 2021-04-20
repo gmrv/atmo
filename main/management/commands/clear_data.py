@@ -17,7 +17,6 @@ class Command(BaseCommand):
         self.delete_all_links()
         self.delete_all(Company)
         self.delete_all(Area)
-        self.delete_all(AreaType)
         self.delete_all(Resource)
         self.delete_all(Group)
         self.delete_all(User)

@@ -12,15 +12,11 @@ class Command(BaseCommand):
 
         # Справочники
 
-        # Типы площадок
-        area_type_coworking = AreaType.objects.create(name='Коворкинг')
-        area_type_floor = AreaType.objects.create(name='Этаж')
-
         # Объекты
 
         cos = Company.objects.create(name="АО \"Fossa\"", short_name="АО \"Fossa\"", full_name="АО \"Fossa\"")
 
-        a = Area.objects.create(name="Fossa Коворкинг №1", type=area_type_coworking)
+        a = Area.objects.create(name="Fossa Коворкинг №1", type=Area.AREA_TYPE_COWORKING)
 
         for n in range(1, 21):
             m = Seat.objects.create(name=str(n).zfill(2))
@@ -34,7 +30,7 @@ class Command(BaseCommand):
         cos.area_set.add(a)
         cos.save()
 
-        a = Area.objects.create(name="Fossa Коворкинг №2", type=area_type_coworking)
+        a = Area.objects.create(name="Fossa Коворкинг №2", type=Area.AREA_TYPE_COWORKING)
         for n in range(1, 11):
             m = Seat.objects.create(name=str(n).zfill(2))
             a.resource_set.add(m)
@@ -46,7 +42,7 @@ class Command(BaseCommand):
 
         ras = Company.objects.create(name="АО \"Beaver\"", short_name="АО \"Beaver\"", full_name="АО \"Beaver\"")
 
-        a = Area.objects.create(name="Beaver Коворкинг №1", type=area_type_coworking)
+        a = Area.objects.create(name="Beaver Коворкинг №1", type=Area.AREA_TYPE_COWORKING)
         for n in range(1, 21):
             m = Seat.objects.create(name=str(n).zfill(2))
             a.resource_set.add(m)
@@ -55,7 +51,7 @@ class Command(BaseCommand):
         ras.area_set.add(a)
         ras.save()
 
-        a = Area.objects.create(name="Beaver Коворкинг №2", type=area_type_coworking)
+        a = Area.objects.create(name="Beaver Коворкинг №2", type=Area.AREA_TYPE_COWORKING)
         for n in range(1, 11):
             m = Seat.objects.create(name=str(n).zfill(2))
             a.resource_set.add(m)
