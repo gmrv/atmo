@@ -1,3 +1,7 @@
+from datetime import datetime, timedelta
+from dateutil.tz import tzlocal
+from django.conf import settings
+from django.utils.timezone import localtime, now, get_current_timezone, get_default_timezone
 from django.db import models
 from django.contrib.auth.models import User, Group
 from main.utils import get_pin
@@ -84,6 +88,72 @@ class Resource(Common):
     def __str__(self):
         return ("Id: %s; Type: %s; Name: %s;" % (self.id, type, self.name))
 
+    def get_raw_calendar(self):
+        # Calendar is a list of {hour, minute} time blocks
+        calendar = []
+
+        # Default OPEN_TIME is 8AM
+        open_hour = '8'
+        open_minute = '00'
+        if hasattr(settings, 'OPEN_TIME') and ':' in settings.OPEN_TIME:
+            open_hour = settings.OPEN_TIME.split(':')[0]
+            open_minute = settings.OPEN_TIME.split(':')[1]
+
+        # Default CLOSE_TIME is 6PM
+        close_hour = '18'
+        close_minute = '00'
+        if hasattr(settings, 'CLOSE_TIME') and ':' in settings.CLOSE_TIME:
+            close_hour = settings.CLOSE_TIME.split(':')[0]
+            close_minute = settings.CLOSE_TIME.split(':')[1]
+
+        for num in range(int(open_hour), int(close_hour)):
+            minutes = open_minute
+            for count in range(0, 2):
+                time_block = {}
+                calendar.append(time_block)
+                if num <= 12:
+                    time_block['hour'] = str(num)
+                else:
+                    time_block['hour'] = str(num - 12)
+                time_block['mil_hour'] = str(num)
+
+                time_block['minutes'] = minutes
+                if minutes == '00':
+                    minutes = '30'
+                else:
+                    minutes = '00'
+                    num += 1
+        return calendar
+
+    def get_calendar(self, target_date=None):
+        if not target_date:
+            target_date = localtime(now()).date()
+
+        # Start with the raw calendar
+        calendar = self.get_raw_calendar()
+
+        # Extract the start and end times from our target date and the raw calendar
+        first_block = calendar[0]
+        last_block = calendar[len(calendar) - 1]
+        tz = tzlocal()
+        start = datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=int(first_block['mil_hour']), minute=int(first_block['minutes']), tzinfo=tz)
+        end = datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=int(last_block['mil_hour']), minute=int(last_block['minutes']), tzinfo=tz)
+        end = end + timedelta(minutes=15)
+        # print("Start: %s, End: %s, TZ: %s" % (start, end, tz))
+
+        # Loop through the events for this day and mark which blocks are reserved
+        # We use time integers in the form of HOURMIN (830, 1600, etc) for comparison
+        #events = self.event_set.filter(room=self, start_ts__gte=start, end_ts__lte=end)
+        bookings = self.booking_set.filter(resource=self, start_ts__gte=start, end_ts__lte=end)
+        for booking in bookings:
+            start_int = int(localtime(booking.start_ts).strftime('%H%M'))
+            end_int = int(localtime(booking.end_ts).strftime('%H%M'))
+            for block in calendar:
+                block_int = int(block['mil_hour'] + block['minutes'])
+                if start_int <= block_int and block_int < end_int:
+                    block['reserved'] = True
+        return calendar
+
 
 class Room(Resource):
     """
@@ -135,11 +205,11 @@ class Booking(Common):
     changed_by = models.CharField(help_text= 'Кем изменено', max_length=50, null=False, default='')
     resource = models.ForeignKey(Resource, help_text= 'Объект бронирования', on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
     user = models.ForeignKey(User, help_text= 'Бронирующий', on_delete=models.deletion.CASCADE, blank=False, null=True, default=None)
-    start = models.DateTimeField(help_text='Начало брони', blank=False)
-    finish = models.DateTimeField(help_text='Окончание брони', blank=False)
+    start_ts = models.DateTimeField(help_text='Начало брони', blank=False)
+    end_ts = models.DateTimeField(help_text='Окончание брони', blank=False)
     confirmed = models.BooleanField(help_text='Подтверждение брони', blank=True, default=False)
-    confirmed_at = models.DateTimeField(help_text='Время изменения')
-    confirmed_by = models.CharField(help_text= 'Кем подтверждено', max_length=50, null=False, default='')
+    confirmed_at = models.DateTimeField(help_text='Время изменения', blank=True, null=True)
+    confirmed_by = models.CharField(help_text= 'Кем подтверждено', max_length=50, blank=True, null=True, default='')
     confirmation_pin = models.PositiveSmallIntegerField(help_text= 'PIN-код', default=get_pin)
     event = models.ForeignKey(Event, help_text= 'Событие', on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
     active = models.BooleanField(blank=True, default=True)

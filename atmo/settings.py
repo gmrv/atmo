@@ -137,3 +137,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # URL that handles login
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
+
+# Local settings
+OPEN_TIME = '08:00'
+CLOSE_TIME = '19:00'
