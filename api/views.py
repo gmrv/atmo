@@ -72,19 +72,23 @@ def set_default_area(request, area_id, username=None):
 def get_area_resource_list(request, area_id, resource_type=Resource.RESOURCE_TYPE_ALL):
     """
     Список ресурсов закрепленных для площадки
+    /api/get_area_resource_list/1/resource
     """
     area = Area.objects.get(pk=area_id)
-    resource_list = []
-    resource_list_all = []
+    seats_list = []
+    rooms_list = []
     for r in area.resource_set.all():
-        resource_list_all.append({"id" : r.id, "name": r.name})
-        if r.type == resource_type:
-            resource_list.append({"id" : r.id, "name": r.name})
+        if r.type == Resource.RESOURCE_TYPE_SEAT:
+            seats_list.append({"id" : r.id, "name": r.name, "calendar": r.get_calendar()})
+        else:
+            rooms_list.append({"id": r.id, "name": r.name, "calendar": r.get_calendar()})
+
 
     response = get_response_template(code='ok', source=request.path, result={})
-    if resource_type==Resource.RESOURCE_TYPE_ALL:
-        response['result'] = resource_list_all
-    else:
-        response['result']  = resource_list
+    response['result'] = {"seats": seats_list, "rooms": rooms_list}
+
+
+    return JsonResponse( response, safe=False)
+
 
     return JsonResponse( response, safe=False)
