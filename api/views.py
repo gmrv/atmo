@@ -47,7 +47,6 @@ def booking(request, id=None, username=None):
     **GET**\r\n
         Получение одного объекта если всех объектов\r\n
         id - Если задан, возвращается заданный объект если не задан возвращаются все\r\n
-        username - если задан возвращаем только площадки компании пользователя.\r\n
 
     **POST**\r\n
         Создание новой записи\r\n
@@ -66,7 +65,7 @@ def booking(request, id=None, username=None):
         id - Идентификатор удаляемой записи\r\n
     """
     if request.method == "GET":
-        result = booking_get(request, id, username)
+        result = booking_get(request, id)
 
     elif request.method == "POST":
         result = booking_post(request)
@@ -88,7 +87,7 @@ def booking(request, id=None, username=None):
 
 
 @login_required
-def user(request):
+def user(request, username=None):
     """
     Обработка запросов связанных с объектом Пользователь\r\n
     **GET**\r\n
@@ -97,6 +96,7 @@ def user(request):
         username - если задан возвращаем только площадки компании пользователя.\r\n
 
     """
+    result = None
     if request.method == "GET":
         xuser = request.user.extuser
         user_json = {
@@ -115,10 +115,12 @@ def user(request):
             })
         user_json["booking_set"] = booking_arr
     else:
-        # 400 Bad Request
-        JsonResponse({}, status=400, safe=False)
+        return JsonResponse({}, status=400, safe=False)
 
-    response = get_response_template(code='ok', source=request.path, result=user_json)
+    if not result:
+        return JsonResponse({}, status=400, safe=False)
+
+    response = get_response_template(code='ok', source=request.path, result=result)
     return JsonResponse(response, status=200, safe=False)
 
 

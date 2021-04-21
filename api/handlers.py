@@ -11,6 +11,11 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 
 
 def area_get(request, id, username):
+    """
+    Получаем инфо площадки по ее id
+    Получаем инфо о всех площадках если id не задан
+    Получаем инфо о всех площадках доступных пользователю через компанию
+    """
     if id:
         # Если есть идентификатор возвращаем одну
         a = Area.objects.get(pk=id)
@@ -30,7 +35,11 @@ def area_get(request, id, username):
     return result
 
 
-def booking_get(request, id, username):
+def booking_get(request, id):
+    """
+    Получаем одну или все записи о бронировании
+    Бронирование по пользователю доступно через эндпоинт User
+    """
     if id:
         b = Booking.objects.get(pk=id)
         data = serializers.serialize('json', [b, ])
@@ -71,6 +80,9 @@ def booking_post(request):
 
 
 def booking_delete(request, id):
+    """
+    Удаление брони по id
+    """
     b = Booking.objects.get(pk=id)
     b.delete()
     return {"id": id}

@@ -25,7 +25,13 @@
 
       <div class="row">
 
-        <div class="col s6"><a id="id-select-area-button" name="id-select-area-button" class="waves-effect waves-light btn" disabled>Выбрать</a></div>
+        <div class="col s6"><a id="id-button-choose" name="id-button-choose" class="waves-effect waves-light btn" disabled>Выбрать</a></div>
+
+      </div>
+
+      <div class="row">
+
+        <div class="col s6"><a id="id-button-test" name="id-button-test" class="waves-effect waves-light btn">Тест</a></div>
 
       </div>
 
@@ -48,21 +54,27 @@
 
       // Обработка выбора площадки
       $('#id-select-area').on('change', function(){
-        $('#id-select-area-button').removeAttr('disabled')
+        $('#id-button-choose').removeAttr('disabled')
       })
 
       // Выбор площадки, переход на домашнюю страницу
-      $('#id-select-area-button').on('click', function(){
+      $('#id-button-choose').on('click', function(){
         let areaId = $("#id-select-area option:selected").val()
-        ajget('/api/set_default_area/' + areaId, "GET", redirectToHome, null)
-        //$.ajax({
-        //  url: '/api/booking/1',
-        //  type: "GET",
-        //  //data: {"resource_id":5, "date_start": "2021-04-22", "date_end": "2021-04-22", "time_start": "12:00","time_end": "13:00"},
-        //  success: function(data){log(data)},
-        //  dataType: "json"
-        //});
+        ajget('/api/user/set_default_area/{{ user.username }}/' + areaId, "GET", redirectToHome, null)
       })
+
+      // Выбор площадки, переход на домашнюю страницу
+      $('#id-button-test').on('click', function(){
+        $.ajax({
+          url: '/api/user/olegov-oo',
+          type: "DELETE",
+          {#data: {"username":"olegov-oo", "password": "1234", "first_name": "Олег", "middle_name": "Олегович", "last_name": "Олегов", "email":"olegov-oo@example.com"},#}
+          success: function(data){log(data)},
+          dataType: "json"
+        });
+      })
+
+
 
     });
 
