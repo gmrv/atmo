@@ -43,8 +43,11 @@
 
 {% block extrajs %}
   <script>
+
+    let username = "{{ username }}"
+
     $(document).ready(function(){
-      ajget('/api/get_available_areas', fillDropdown, null)
+      ajget('/api/area/' + username, "GET", fillDropdown, null)
 
       // Обработка выбора площадки
       $('#id-select-area').on('change', function(){
@@ -54,7 +57,14 @@
       // Выбор площадки, переход на домашнюю страницу
       $('#id-select-area-button').on('click', function(){
         let areaId = $( "#id-select-area option:selected" ).val()
-        ajget('/api/set_default_area/' + areaId, redirectToHome, null)
+        ajget('/api/set_default_area/' + areaId, "GET", redirectToHome, null)
+        //$.ajax({
+        //  url: '/api/booking/1',
+        //  type: "GET",
+        //  //data: {"resource_id":5, "date_start": "2021-04-22", "date_end": "2021-04-22", "time_start": "12:00","time_end": "13:00"},
+        //  success: function(data){log(data)},
+        //  dataType: "json"
+        //});
       })
 
     });
