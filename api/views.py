@@ -1,10 +1,8 @@
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.urls import reverse
-from api.utils import get_response_template, datetimestring_to_ts
+from api.handlers import *
 from main.models.core import *
+from api.utils import *
 from django.utils import timezone
-from django.utils.timezone import localtime, now
+
 
 @login_required
 def index(request):
@@ -17,39 +15,71 @@ def home(request):
 
 
 @login_required
-def get_info(request):
+def area(request, id=None, username=None):
     """
-    Тестирование документации
-
-    **Контекст**
-
-    ``моямодель``
-        Интерфейс для :model:`myapp.MyModel`.
-
-    **Темплейт:**
-
-    :template:`myapp/my_template.html`
+    Обработка запросов связанных с объектом Площадка\r\n
+    **GET**\r\n
+        Получение одного объекта если всех объектов\r\n
+        id - Если задан, возвращается заданный объект если не задан возвращаются все\r\n
+        username - если задан возвращаем только площадки компании пользователя.\r\n
+        ``*username получаем из параметра а не из request``
     """
-    return HttpResponse('info')
+    if request.method == "GET":
+        # Обработка получения объектов
+        result = area_get(request, id, username)
+    else:
+        # 400 Bad Request
+        return JsonResponse({}, status=400, safe=False)
+
+    response = get_response_template(code='ok', source=request.path, result=result)
+    return JsonResponse(response, status=200, safe=False)
 
 
 @login_required
-def get_available_areas(request, username=None):
+def booking(request, id=None, username=None):
     """
-    Получить список доступных площадок для пользователя
+    Обработка запросов связанных с объектом Бронирование\r\n
+    **GET**\r\n
+        Получение одного объекта если всех объектов\r\n
+        id - Если задан, возвращается заданный объект если не задан возвращаются все\r\n
+        username - если задан возвращаем только площадки компании пользователя.\r\n
+
+    **POST**\r\n
+        Создание новой записи\r\n
+        resource_id - Ресурс который собираемся забронировать\r\n
+        date_start - Дата начала брони (если не задана то текущая)\r\n
+        time_start - Время начала брони (если не задано то начало дня из settings.OPEN_TIME)\r\n
+        date_end - Дата окончания брони (если не задана то текущая)\r\n
+        time_end - Время окончания брони (если не задано то окончание дня из settings.CLOSE_TIME)\r\n
+        todo: description - если задано создаем евент с соответстующим описанием\r\n
+
+    **PUT**\r\n
+        todo: Обновление/изменение полей записи, деактивация брони, подтверждение брони\r\n
+
+    **DELETE**\r\n
+        Удаление записи о бронировании\r\n
+        id - Идентификатор удаляемой записи\r\n
     """
-    if username:
-        xuser = ExtUser.objects.get(username=username)
+    if request.method == "GET":
+        result = booking_get(request, id, username)
+
+    elif request.method == "POST":
+        result = booking_post(request)
+        if not result:
+            return JsonResponse({}, status=400, safe=False)
+
+    elif request.method == "PUT":
+        pass
+
+    elif request.method == "DELETE":
+        result = booking_delete(request, id)
+
     else:
-        xuser = request.user.extuser
+        # 400 Bad Request
+        JsonResponse({}, status=400, safe=False)
 
-    areas = []
-    area_query = Area.objects.filter(company=xuser.company)
-    for a in area_query:
-        areas.append({'id' : a.id, 'name' : a.name})
-
-    response = get_response_template(code='ok', source=request.path, result=areas)
-    return JsonResponse( response, safe=False)
+    response = get_response_template(code='ok', source=request.path, result=result)
+    return JsonResponse(response, status=200, safe=False)
 
 
 @login_required
@@ -66,7 +96,7 @@ def set_default_area(request, area_id, username=None):
     xuser.save()
 
     response = get_response_template(code='ok', source=request.path, result=None)
-    return JsonResponse( response, safe=False)
+    return JsonResponse(response, status=200, safe=False)
 
 
 @login_required
@@ -84,35 +114,7 @@ def get_area_resource_list(request, area_id, resource_type=Resource.RESOURCE_TYP
         else:
             rooms_list.append({"id": r.id, "name": r.name, "calendar": r.get_calendar()})
 
+    result = {"seats": seats_list, "rooms": rooms_list}
+    response = get_response_template(code='ok', source=request.path, result=result)
 
-    response = get_response_template(code='ok', source=request.path, result={})
-    response['result'] = {"seats": seats_list, "rooms": rooms_list}
-
-
-    return JsonResponse( response, safe=False)
-
-
-@login_required
-def create_resource_booking(request,
-                            resource_id,
-                            date_start=str(timezone.now().date()),
-                            time_start=settings.OPEN_TIME,
-                            date_end=str(timezone.now().date()),
-                            time_end=settings.CLOSE_TIME):
-    """
-    Создание записи о бронировании
-    /api/create_resource_booking/2/2021-04-20/15:00/2021-04-20/17:00/
-    """
-    print(resource_id, date_start, time_start, date_end, time_end)
-
-    start = date_start + " " + time_start
-    end = date_end + " " + time_end
-    start_ts = datetimestring_to_ts(start, "%Y-%m-%d %H:%M")
-    end_ts = datetimestring_to_ts(end, "%Y-%m-%d %H:%M")
-    #end_ts = end_ts + timedelta(minutes=29)
-    begin = datetimestring_to_ts(str(timezone.now().date()) + " 00:00" , "%Y-%m-%d %H:%M")
-
-    Booking.objects.create(resource_id=resource_id, user=request.user, start_ts=start_ts, end_ts=end_ts, confirmed=True)
-
-    response = get_response_template(code='ok', source=request.path, result={})
-    return JsonResponse( response, safe=False)
+    return JsonResponse(response, status=200, safe=False)

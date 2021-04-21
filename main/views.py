@@ -51,6 +51,7 @@ def area_select(request):
         areas.append({'id' : a.id, 'name' : a.name})
 
     context = {
+        'username': request.user.username,
         'areas': areas,
     }
     return render(request, 'main/area_select.html', context)
