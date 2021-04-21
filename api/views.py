@@ -36,6 +36,11 @@ def area(request, id=None, username=None):
 
 
 @login_required
+def get_area_by_username(request, username):
+    return area(request, id=None, username=username)
+
+
+@login_required
 def booking(request, id=None, username=None):
     """
     Обработка запросов связанных с объектом Бронирование\r\n
@@ -79,6 +84,41 @@ def booking(request, id=None, username=None):
         JsonResponse({}, status=400, safe=False)
 
     response = get_response_template(code='ok', source=request.path, result=result)
+    return JsonResponse(response, status=200, safe=False)
+
+
+@login_required
+def user(request):
+    """
+    Обработка запросов связанных с объектом Пользователь\r\n
+    **GET**\r\n
+        Получение одного объекта если всех объектов\r\n
+        id - Если задан, возвращается заданный объект если не задан возвращаются все\r\n
+        username - если задан возвращаем только площадки компании пользователя.\r\n
+
+    """
+    if request.method == "GET":
+        xuser = request.user.extuser
+        user_json = {
+            "id": xuser.id,
+            "username": xuser.username,
+            "company_id": xuser.company_id,
+            "booking_set": []
+        }
+        booking_set = xuser.booking_set.all()
+        booking_arr = []
+        for b in booking_set:
+            booking_arr.append({
+                "id": b.id,
+                "start_ts": b.start_ts,
+                "end_ts": b.end_ts
+            })
+        user_json["booking_set"] = booking_arr
+    else:
+        # 400 Bad Request
+        JsonResponse({}, status=400, safe=False)
+
+    response = get_response_template(code='ok', source=request.path, result=user_json)
     return JsonResponse(response, status=200, safe=False)
 
 
