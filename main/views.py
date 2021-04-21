@@ -28,6 +28,7 @@ def home(request):
         rooms.append({"id": r.id, "name": r.name, "seats": r.capacity })
 
     context = {
+        'user': request.user,
         'area': xuser.def_area.name,
         'seats': seats,
         'rooms': rooms,
@@ -51,7 +52,7 @@ def area_select(request):
         areas.append({'id' : a.id, 'name' : a.name})
 
     context = {
-        'username': request.user.username,
+        'user': xuser,
         'areas': areas,
     }
     return render(request, 'main/area_select.html', context)

@@ -100,7 +100,10 @@
   {% csrf_token %}
 
   <script>
-    isDebug = true
+    let isDebug = true
+    let userId = {{ user.id }};
+    let userName = "{{ user.username }}";
+    let userCompanyId = "{{ user.company_id }}";
 
     $(document).ready(function() {
       $('select').formSelect();
