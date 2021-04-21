@@ -1,3 +1,4 @@
 .idea*
 /docker-compose.yml
 /atmo/settings.ini
+/docs/memo.txt
