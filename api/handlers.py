@@ -86,3 +86,66 @@ def booking_delete(request, id):
     b = Booking.objects.get(pk=id)
     b.delete()
     return {"id": id}
+
+
+def user_get(request, username):
+    """
+    Получаем одного или всех пользователей
+    """
+    if username:
+        if ExtUser.objects.filter(username=username).count() < 1:
+            return None
+        xuser = ExtUser.objects.get(username=username)
+        return extuser_to_json(xuser, is_short=False)
+    else:
+        users = ExtUser.objects.filter(is_active=True)
+        result = []
+        for u in users:
+            result.append(extuser_to_json(u, is_short=False))
+        return result
+
+
+def user_post(request):
+    """
+    Создание пользователя
+    """
+    username = request.POST.get("username", None)
+    password = request.POST.get("password", None)
+    first_name= request.POST.get("first_name", None)
+    middle_name= request.POST.get("middle_name", None)
+    last_name= request.POST.get("last_name", None)
+    email= request.POST.get("email", None)
+    is_superuser= request.POST.get("is_superuser", False)
+    is_staff= request.POST.get("is_staff", False)
+    is_active= request.POST.get("is_active", True)
+    company_id= request.POST.get("company_id", None)
+
+    if (not username) or (not password) or (not first_name):
+        return None
+
+    xuser = ExtUser.objects.create(
+        username=username,
+        first_name=first_name,
+        middle_name=middle_name,
+        last_name=last_name,
+        email=email,
+        is_superuser=is_superuser,
+        is_staff=is_staff,
+        is_active=is_active,
+        company_id=company_id,
+    )
+    xuser.set_password(password)
+    xuser.save()
+    return extuser_to_json(xuser)
+
+
+def user_delete(request, username):
+    """
+    Ну удаляем, помечаем как не активного
+    """
+    if ExtUser.objects.filter(username=username).count() < 1:
+        return None
+    xuser = ExtUser.objects.get(username=username)
+    xuser.is_active = False
+    xuser.save()
+    return extuser_to_json(xuser)

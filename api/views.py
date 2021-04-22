@@ -98,22 +98,12 @@ def user(request, username=None):
     """
     result = None
     if request.method == "GET":
-        xuser = request.user.extuser
-        user_json = {
-            "id": xuser.id,
-            "username": xuser.username,
-            "company_id": xuser.company_id,
-            "booking_set": []
-        }
-        booking_set = xuser.booking_set.all()
-        booking_arr = []
-        for b in booking_set:
-            booking_arr.append({
-                "id": b.id,
-                "start_ts": b.start_ts,
-                "end_ts": b.end_ts
-            })
-        user_json["booking_set"] = booking_arr
+        result = user_get(request, username)
+    elif request.method == "POST":
+        result = user_post(request)
+    elif request.method == "DELETE":
+        result = user_delete(request, username)
+
     else:
         return JsonResponse({}, status=400, safe=False)
 
