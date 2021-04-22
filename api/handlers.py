@@ -92,10 +92,15 @@ def user_get(request, username):
     """
     Получаем одного или всех пользователей
     """
-    if username:
-        if ExtUser.objects.filter(username=username).count() < 1:
-            return None
-        xuser = ExtUser.objects.get(username=username)
+    if id or username:
+        if id:
+            if ExtUser.objects.filter(pk=id).count() < 1:
+                return None
+            xuser = ExtUser.objects.get(pk=id)
+        else:
+            if ExtUser.objects.filter(username=username).count() < 1:
+                return None
+            xuser = ExtUser.objects.get(username=username)
         return extuser_to_json(xuser, is_short=False)
     else:
         users = ExtUser.objects.filter(is_active=True)
@@ -105,10 +110,12 @@ def user_get(request, username):
         return result
 
 
-def user_post(request):
+def user_post(request, id=None, username=None):
     """
-    Создание пользователя
+    Создание|обновление пользователя
+    см. описание api.views.user
     """
+    id = request.POST.get("id", None)
     username = request.POST.get("username", None)
     password = request.POST.get("password", None)
     first_name= request.POST.get("first_name", None)
@@ -120,28 +127,43 @@ def user_post(request):
     is_active= request.POST.get("is_active", True)
     company_id= request.POST.get("company_id", None)
 
-    if (not username) or (not password) or (not first_name):
-        return None
+    if id or username:
+        # Обновить
+        if id:
+            xuser = ExtUser.objects.get(pk=id)
+        else:
+            xuser = ExtUser.objects.get(username=username)
+        if username: xuser.username = username
+        if first_name: xuser.first_name = first_name
+        if middle_name: xuser.middle_name = middle_name
+        if last_name: xuser.last_name = last_name
+        if email: xuser.email = email
+        if company_id: xuser.company_id = company_id
+    else:
+        # Создать
+        if (not username) or (not password) or (not first_name): return None
+        xuser = ExtUser.objects.create(
+            username=username,
+            first_name=first_name,
+            middle_name=middle_name,
+            last_name=last_name,
+            email=email,
+            is_superuser=is_superuser,
+            is_staff=is_staff,
+            is_active=is_active,
+            company_id=company_id,
+        )
+    if password:
+        xuser.set_password(password)
 
-    xuser = ExtUser.objects.create(
-        username=username,
-        first_name=first_name,
-        middle_name=middle_name,
-        last_name=last_name,
-        email=email,
-        is_superuser=is_superuser,
-        is_staff=is_staff,
-        is_active=is_active,
-        company_id=company_id,
-    )
-    xuser.set_password(password)
     xuser.save()
     return extuser_to_json(xuser)
 
 
 def user_delete(request, username):
     """
-    Ну удаляем, помечаем как не активного
+    Не удаляем, помечаем как не активного
+    см. описание api.views.user
     """
     if ExtUser.objects.filter(username=username).count() < 1:
         return None

@@ -66,8 +66,9 @@
       // Выбор площадки, переход на домашнюю страницу
       $('#id-button-test').on('click', function(){
         $.ajax({
-          url: '/api/user/olegov-oo',
-          type: "DELETE",
+          url: '/api/user',
+          type: "POST",
+          data: {"username":"petrov-pp", "email":"petrov-pp@example.com"},
           {#data: {"username":"olegov-oo", "password": "1234", "first_name": "Олег", "middle_name": "Олегович", "last_name": "Олегов", "email":"olegov-oo@example.com"},#}
           success: function(data){log(data)},
           dataType: "json"

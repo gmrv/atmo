@@ -55,6 +55,10 @@ class Command(BaseCommand):
 
         # Пользователи
 
+        u = ExtUser.objects.create(username="root", is_staff=True, is_superuser=True)
+        u.set_password("1234")
+        u.save()
+
         u = ExtUser.objects.create(username="ivanov-ii", email="ivanov-ii@a.com", company=cos,
             first_name="Иван", middle_name="Иванович", last_name="Иванов")
         u.set_password("1234")
@@ -75,6 +79,4 @@ class Command(BaseCommand):
         u.set_password("1234")
         u.save()
 
-        u = ExtUser.objects.create(username="root", is_staff=True, is_superuser=True)
-        u.set_password("1234")
-        u.save()
+
