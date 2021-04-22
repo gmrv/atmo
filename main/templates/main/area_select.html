@@ -60,7 +60,7 @@
       // Выбор площадки, переход на домашнюю страницу
       $('#id-button-choose').on('click', function(){
         let areaId = $("#id-select-area option:selected").val()
-        ajget('/api/user/set_default_area/{{ user.username }}/' + areaId, "GET", redirectToHome, null)
+        ajget('/api/user/set_default_area/' + areaId + '/{{ user.username }}', "GET", redirectToHome, null)
       })
 
       // Выбор площадки, переход на домашнюю страницу

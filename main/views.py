@@ -29,7 +29,7 @@ def home(request):
 
     context = {
         'user': request.user,
-        'area': xuser.def_area.name,
+        'area': xuser.def_area,
         'seats': seats,
         'rooms': rooms,
         'all_day': True,
