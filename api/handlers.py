@@ -88,7 +88,7 @@ def booking_delete(request, id):
     return {"id": id}
 
 
-def user_get(request, username):
+def user_get(request, id, username):
     """
     Получаем одного или всех пользователей
     """
@@ -127,6 +127,41 @@ def user_post(request, id=None, username=None):
     is_active= request.POST.get("is_active", True)
     company_id= request.POST.get("company_id", None)
 
+    # Создать
+    if (not username) or (not password) or (not first_name): return None
+    xuser = ExtUser.objects.create(
+        username=username,
+        first_name=first_name,
+        middle_name=middle_name,
+        last_name=last_name,
+        email=email,
+        is_superuser=is_superuser,
+        is_staff=is_staff,
+        is_active=is_active,
+        company_id=company_id,
+    )
+    if password:
+        xuser.set_password(password)
+
+    xuser.save()
+    return extuser_to_json(xuser)
+
+
+def user_put(request):
+    """
+    Обновление пользователя
+    см. описание api.views.user
+    """
+    put = PUT(request)
+    id = put.get("id", None)
+    username = put.get("username", None)
+    password = put.get("password", None)
+    first_name= put.get("first_name", None)
+    middle_name= put.get("middle_name", None)
+    last_name= put.get("last_name", None)
+    email= put.get("email", None)
+    company_id= put.get("company_id", None)
+
     if id or username:
         # Обновить
         if id:
@@ -140,22 +175,9 @@ def user_post(request, id=None, username=None):
         if email: xuser.email = email
         if company_id: xuser.company_id = company_id
     else:
-        # Создать
-        if (not username) or (not password) or (not first_name): return None
-        xuser = ExtUser.objects.create(
-            username=username,
-            first_name=first_name,
-            middle_name=middle_name,
-            last_name=last_name,
-            email=email,
-            is_superuser=is_superuser,
-            is_staff=is_staff,
-            is_active=is_active,
-            company_id=company_id,
-        )
+        return None
     if password:
         xuser.set_password(password)
-
     xuser.save()
     return extuser_to_json(xuser)
 

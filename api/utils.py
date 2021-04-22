@@ -1,5 +1,23 @@
+import urllib
 from datetime import datetime
 from django.utils import timezone
+
+
+class PUT:
+
+    params = {}
+
+    def __init__(self, request):
+        for item in request.body.decode("utf-8").split('&'):
+            arr = item.split("=")
+            self.params[urllib.parse.unquote(arr[0])] = urllib.parse.unquote(arr[1])
+
+    def get(self, key, default):
+        if key in self.params:
+            return self.params[key]
+        else:
+            return default
+
 
 def get_response_template(code='0', result={}, source='unknown') -> object:
     template = {
@@ -9,11 +27,13 @@ def get_response_template(code='0', result={}, source='unknown') -> object:
     }
     return template
 
+
 def datetimestring_to_ts(datetimestring, template):
     return timezone.make_aware(
         datetime.strptime(datetimestring, template),
         timezone.get_current_timezone()
     )
+
 
 def extuser_to_json(extuser, is_short=False):
     """

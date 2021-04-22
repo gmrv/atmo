@@ -87,23 +87,49 @@ def booking(request, id=None, username=None):
 
 
 @login_required
-def user(request, username=None):
+def user(request, id=None, username=None):
     """
-    Обработка запросов связанных с объектом Пользователь\r\n
-    **GET**\r\n
-        Получение одного объекта если всех объектов\r\n
-        id - Если задан, возвращается заданный объект если не задан возвращаются все\r\n
-        username - если задан возвращаем только площадки компании пользователя.\r\n
-
+    Обработка запросов связанных с объектом Пользователь                                        \r\n
+    **GET**                                                                                     \r\n
+        Получение одного объекта если всех объектов                                             \r\n
+        /api/user           - Получить всех пользователей;                                      \r\n
+        /api/user/1         - Получить пользователя с id = 1;                                   \r\n
+        /api/user/ivanov-ii - Получить пользователя с username = ivanov-ii;                     \r\n
+    **POST**                                                                                    \r\n
+        Cоздать пользователя                                                                    \r\n
+        /api/user                                                                               \r\n
+        username - Логин;                                                                       \r\n
+        password - Пароль;                                                                      \r\n
+        first_name - Имя;                                                                       \r\n
+        middle_name - Отчество;                                                                 \r\n
+        last_name - Фамилия;                                                                    \r\n
+        email - Электронная почта;                                                              \r\n
+        is_superuser - Флаг администратора;                                                     \r\n
+        is_staff - Флаг персонала;                                                              \r\n
+        is_active - Фдаг активности пользователя;                                               \r\n
+        company_id - Идентификатора комании.                                                    \r\n
+    **PUT**                                                                                     \r\n
+        Обновить пользователя                                                                   \r\n
+        Параметры посыдаются через тело запроса, как в POST                                     \r\n
+        /api/user                                                                               \r\n
+        id  - Если задан, значит обновить пользователя с этим id. Приоритетнее чем username;    \r\n
+        username - Если задан, значит обновить пользователя с этим username;                    \r\n
+        Остальные поля как в POST                                                               \r\n
+    **DELETE**                                                                                  \r\n
+        Удаление пользователя с заданным id или username                                        \r\n
+        Фактически не удаляем. Помечаем is_active = False                                       \r\n
+        /api/user/1                                                                             \r\n
+        /api/user/ivanov-ii                                                                     \r\n
     """
     result = None
     if request.method == "GET":
-        result = user_get(request, username)
+        result = user_get(request, id, username)
     elif request.method == "POST":
         result = user_post(request)
+    elif request.method == "PUT":
+        result = user_put(request)
     elif request.method == "DELETE":
-        result = user_delete(request, username)
-
+        result = user_delete(request, id, username)
     else:
         return JsonResponse({}, status=400, safe=False)
 
