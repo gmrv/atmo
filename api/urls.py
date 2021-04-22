@@ -12,10 +12,8 @@ urlpatterns = [
     path('area', views.area, name='area'),
     path('area/<int:id>', views.area, name='area'),
     path('area/<str:username>', views.area, name='area'),
-    # Получить площадки доступные для компании пользователя
-    path('area/get_area_by_username/<str:username>', views.get_area_by_username, name='area'),
-    # Получить список всех ресурсов для площадки
-    path('area/get_area_resource_list/<int:area_id>/', views.get_area_resource_list, name='get_area_resource_list'),
+    # Получить список всех ресурсов для площадки сгруппированные по типу (seat, room)
+    path('area/get_area_resource_list/<int:area_id>', views.get_area_resource_list, name='get_area_resource_list'),
 
 
     # Booking

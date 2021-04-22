@@ -115,9 +115,9 @@ def user_get(request, id, username):
         return result
 
 
-def user_post(request, id=None, username=None):
+def user_post(request):
     """
-    Создание|обновление пользователя
+    Создание пользователя
     см. описание api.views.user
     """
     id = request.POST.get("id", None)
