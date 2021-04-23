@@ -62,7 +62,7 @@ class Area(Common):
             "seats": []
         }
         for r in self.resource_set.all():
-                result[r.type + "s"].append(r.to_json(is_short=True))
+                result[r.type + "s"].append(r.to_json(is_short=False))
         return result
 
 
@@ -190,7 +190,7 @@ class Resource(Common):
         tz = tzlocal()
         start = datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=int(first_block['mil_hour']), minute=int(first_block['minutes']), tzinfo=tz)
         end = datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=int(last_block['mil_hour']), minute=int(last_block['minutes']), tzinfo=tz)
-        end = end + timedelta(minutes=15)
+        end = end + timedelta(minutes=30)
         # print("Start: %s, End: %s, TZ: %s" % (start, end, tz))
 
         # Loop through the events for this day and mark which blocks are reserved
@@ -205,6 +205,26 @@ class Resource(Common):
                 if start_int <= block_int and block_int < end_int:
                     block['reserved'] = True
         return calendar
+
+    def get_percent_of_booked_time(self, target_date=None):
+        if not target_date:
+            target_date = localtime(now()).date()
+        tz = tzlocal()
+        day_start = datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=0, minute=0, tzinfo=tz)
+        day_end = datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=23, minute=59, tzinfo=tz)
+
+        open_time = datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=int(settings.OPEN_TIME.split(":")[0]), minute=int(settings.OPEN_TIME.split(":")[1]), tzinfo=tz)
+        close_time = datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=int(settings.CLOSE_TIME.split(":")[0]), minute=int(settings.CLOSE_TIME.split(":")[1]), tzinfo=tz)
+
+        all_time = close_time - open_time
+        booked_time = timedelta()
+
+        bookings = self.booking_set.filter(resource=self, start_ts__gte=day_start, end_ts__lte=day_end)
+        for booking in bookings:
+            booked_time = booked_time + (booking.end_ts - booking.start_ts)
+
+        return(round(booked_time.total_seconds()/all_time.total_seconds()*100, 2))
+
 
     def to_json(self, is_short=False):
         if hasattr(self, 'room'):
@@ -226,7 +246,8 @@ class Room(Resource):
             "type": self.type,
             "area": self.area_id,
             "capacity": self.capacity,
-            "calendar": {} if is_short else self.get_calendar()
+            "calendar": {} if is_short else self.get_calendar(),
+            "percent_of_booked_time": self.get_percent_of_booked_time()
         }
         return result
 
@@ -245,7 +266,8 @@ class Seat(Resource):
             "area": self.area_id,
             "persisted": self.persisted,
             "owner": self.owner_id,
-            "calendar": {} if is_short else self.get_calendar()
+            "calendar": {} if is_short else self.get_calendar(),
+            "percent_of_booked_time": self.get_percent_of_booked_time()
         }
         return result
 

@@ -106,7 +106,7 @@ def booking_confirmation(request, id, pin):
         b.confirmed_by = request.user.id
         b.confirmed_at = localtime(now())
         b.save()
-        result = booking_to_json(b)
+        result = b.to_json()
     else:
         JsonResponse({}, status=400, safe=False)
     response = get_response_template(code='ok', source=request.path, result=result)
@@ -114,7 +114,7 @@ def booking_confirmation(request, id, pin):
 
 
 @login_required
-def resource(request, r_id=None):
+def resource(request, resource_id=None):
     """
     Обработка запросов связанных с объектом Ресурс (Resource)                                   \r\n
     Resource это родительский класс для Seat и Room                                             \r\n
@@ -127,25 +127,13 @@ def resource(request, r_id=None):
     """
     result = None
     if request.method == "GET":
-        result = resource_get(request, resource_id=r_id)
+        result = resource_get(request, resource_id=resource_id)
     else:
         return JsonResponse({}, status=400, safe=False)
 
     if not result:
         return JsonResponse({}, status=400, safe=False)
 
-    response = get_response_template(code='ok', source=request.path, result=result)
-    return JsonResponse(response, status=200, safe=False)
-
-
-@login_required
-def resource_by_area(request, area_id):
-    if area_id:
-        if Area.objects.filter(pk=area_id).count() < 1:
-            return JsonResponse({}, status=400, safe=False)
-        result = resource_get(request, area_id=area_id)
-    else:
-        return JsonResponse({}, status=400, safe=False)
     response = get_response_template(code='ok', source=request.path, result=result)
     return JsonResponse(response, status=200, safe=False)
 

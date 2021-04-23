@@ -23,8 +23,7 @@ urlpatterns = [
 
     # Resource
     path('resource', views.resource, name='resource'),
-    path('resource/<int:id>', views.resource, name='resource'),
-    path('resource/by_area/<int:area_id>', views.resource_by_area, name='resource_by_area'),
+    path('resource/<int:resource_id>', views.resource, name='resource'),
 
 
     # User
