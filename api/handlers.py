@@ -47,7 +47,7 @@ def booking_get(request, id, date):
     """
     if id:
         b = Booking.objects.get(pk=id)
-        result = booking_to_json(b)
+        result = b.to_json()
     else:
         if date:
             ts_start = datetimestring_to_ts(date + " 00:00", "%Y-%m-%d %H:%M")
@@ -57,7 +57,7 @@ def booking_get(request, id, date):
             booking_query = Booking.objects.all()
         result = []
         for b in booking_query:
-            result.append(booking_to_json(b))
+            result.append(b.to_json())
     return result
 
 
@@ -88,8 +88,7 @@ def booking_post(request):
         confirmed=True
     )
 
-    result = booking_to_json(b)
-    return result
+    return b.to_json()
 
 
 def booking_put(request):
@@ -124,9 +123,9 @@ def resource_get(request, resource_id=None, area_id=None):
         rooms_list = []
         for r in resource_query:
             if r.type == Resource.RESOURCE_TYPE_SEAT:
-                seats_list.append(r.to_json())
+                seats_list.append(r.to_json(is_short=True))
             elif r.type == Resource.RESOURCE_TYPE_ROOM:
-                rooms_list.append(r.to_json())
+                rooms_list.append(r.to_json(is_short=True))
             else:
                 pass
         result = {"seats": seats_list, "rooms": rooms_list}
@@ -146,12 +145,12 @@ def user_get(request, id, username):
             if ExtUser.objects.filter(username=username).count() < 1:
                 return None
             xuser = ExtUser.objects.get(username=username)
-        return extuser_to_json(xuser, is_short=False)
+        return xuser.to_json(is_short=False)
     else:
-        users = ExtUser.objects.filter(is_active=True)
+        xusers = ExtUser.objects.filter(is_active=True)
         result = []
-        for u in users:
-            result.append(extuser_to_json(u, is_short=False))
+        for u in xusers:
+            result.append(u.to_json(is_short=True))
         return result
 
 
@@ -189,7 +188,7 @@ def user_post(request):
         xuser.set_password(password)
 
     xuser.save()
-    return extuser_to_json(xuser)
+    return xuser.to_json()
 
 
 def user_put(request):
@@ -224,7 +223,7 @@ def user_put(request):
     if password:
         xuser.set_password(password)
     xuser.save()
-    return extuser_to_json(xuser)
+    return xuser.to_json()
 
 
 def user_delete(request, username):
@@ -237,4 +236,4 @@ def user_delete(request, username):
     xuser = ExtUser.objects.get(username=username)
     xuser.is_active = False
     xuser.save()
-    return extuser_to_json(xuser)
+    return xuser.to_json()

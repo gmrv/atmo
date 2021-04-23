@@ -7,7 +7,6 @@
 
 {% block content %}
   <div class="container">
-
 		<form id="id-area-form" name="id-area-form" class='' method="POST" action=".">
 
       <div class="row">
@@ -37,12 +36,8 @@
 
       {% csrf_token %}
 
-      </form>
+    </form>
   </div>
-
-
-
-
 {% endblock %}
 
 {% block floating_content %}{% endblock %}
@@ -63,7 +58,7 @@
         ajget('/api/user/set_default_area/' + areaId + '/{{ user.username }}', "GET", redirectToHome, null)
       })
 
-      // Выбор площадки, переход на домашнюю страницу
+      //
       $('#id-button-test').on('click', function(){
         $.ajax({
           url: '/api/booking',
@@ -76,8 +71,6 @@
           dataType: "json"
         });
       })
-
-
 
     });
 

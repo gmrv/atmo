@@ -55,6 +55,38 @@ class ExtUser(User):
     active = models.BooleanField(blank=True, default=True)
     def_area = models.ForeignKey(Area, help_text='Площадка по умолчанию', on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
 
+    def to_json(self, is_short=False):
+        if is_short:
+            result = {
+                "id": self.id,
+                "username": self.username,
+            }
+        else:
+            result = {
+                "id": self.id,
+                "username": self.username,
+                "first_name": self.first_name,
+                "middle_name": self.middle_name,
+                "last_name": self.last_name,
+                "email": self.email,
+                "is_superuser": self.is_superuser,
+                "is_staff": self.is_staff,
+                "is_active": self.is_active,
+                "company_id": self.company_id,
+                "booking_set": []
+            }
+
+            booking_set = self.booking_set.all()
+            booking_arr = []
+            for b in booking_set:
+                booking_arr.append({
+                    "id": b.id,
+                    "start_ts": b.start_ts,
+                    "end_ts": b.end_ts
+                })
+            result["booking_set"] = booking_arr
+        return result
+
 
 class Notification(Common):
     """
@@ -154,11 +186,11 @@ class Resource(Common):
                     block['reserved'] = True
         return calendar
 
-    def to_json(self):
+    def to_json(self, is_short=False):
         if hasattr(self, 'room'):
-            return self.room.to_json()
+            return self.room.to_json(is_short)
         if hasattr(self, 'seat'):
-            return self.seat.to_json()
+            return self.seat.to_json(is_short)
 
 
 class Room(Resource):
@@ -167,14 +199,14 @@ class Room(Resource):
     """
     capacity = models.SmallIntegerField(help_text= 'Количество сидячих мест', default=0)
 
-    def to_json(self):
+    def to_json(self, is_short=False):
         result = {
             "id": self.id,
             "name": self.name,
             "type": self.type,
             "area": self.area_id,
             "capacity": self.capacity,
-            "calendar": self.get_calendar()
+            "calendar": {} if is_short else self.get_calendar()
         }
         return result
 
@@ -185,7 +217,7 @@ class Seat(Resource):
     """
     persisted = models.BooleanField(help_text= 'Постоянное место', blank=True, default=False)
     owner = models.ForeignKey(User, help_text= 'За кем закреплено', on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
-    def to_json(self):
+    def to_json(self, is_short=False):
         result = {
             "id": self.id,
             "name": self.name,
@@ -193,7 +225,7 @@ class Seat(Resource):
             "area": self.area_id,
             "persisted": self.persisted,
             "owner": self.owner_id,
-            "calendar": self.get_calendar()
+            "calendar": {} if is_short else self.get_calendar()
         }
         return result
 
@@ -241,3 +273,23 @@ class Booking(Common):
     confirmation_pin = models.PositiveSmallIntegerField(help_text= 'PIN-код', default=get_pin)
     event = models.ForeignKey(Event, help_text= 'Событие', on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
     active = models.BooleanField(blank=True, default=True)
+
+    def to_json(self):
+        result = {
+            "id": self.id,
+            "created_at": self.created_at,
+            "created_by": self.created_by,
+            "changed_at": self.changed_at,
+            "changed_by": self.changed_by,
+            "resource": self.resource_id,
+            "user": self.user_id,
+            "start_ts": self.start_ts,
+            "end_ts": self.end_ts,
+            "confirmed": self.confirmed,
+            "confirmed_at": self.confirmed_at,
+            "confirmed_by": self.confirmed_by,
+            "confirmation_pin": self.confirmation_pin,
+            "event": self.event_id,
+            "active": self.active
+        }
+        return result
