@@ -19,7 +19,8 @@ urlpatterns = [
     # Booking
     path('booking', views.booking, name='booking'),
     path('booking/<int:id>', views.booking, name='booking'),
-    path('booking/<str:username>', views.booking, name='booking'),
+    path('booking/<slug:date>', views.booking, name='booking'),
+    path('booking/confirmation/<int:id>/<int:pin>', views.booking_confirmation, name='booking_confirmation'),
 
 
     # User

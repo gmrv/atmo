@@ -40,23 +40,32 @@ def area_get(request, id, username):
     return result
 
 
-def booking_get(request, id):
+def booking_get(request, id, date):
     """
     Получаем одну или все записи о бронировании
     Бронирование по пользователю доступно через эндпоинт User
     """
     if id:
         b = Booking.objects.get(pk=id)
-        data = serializers.serialize('json', [b, ])
-        result = json.loads(data)[0]
+        result = booking_to_json(b)
     else:
-        booking_query = Booking.objects.all()
-        data = serializers.serialize('json', booking_query)
-        result = json.loads(data)
+        if date:
+            ts_start = datetimestring_to_ts(date + " 00:00", "%Y-%m-%d %H:%M")
+            ts_end = ts_start + timedelta(days=1)
+            booking_query = Booking.objects.filter(Q(start_ts__gte=ts_start) & Q(start_ts__lte=ts_end))
+        else:
+            booking_query = Booking.objects.all()
+        result = []
+        for b in booking_query:
+            result.append(booking_to_json(b))
     return result
 
 
 def booking_post(request):
+    """
+    Создание записи о бронировании
+    """
+    user_id = request.POST.get("user_id", None)
     resource_id = request.POST.get("resource_id", None)
     date_start = request.POST.get("date_start", str(timezone.now().date()))
     time_start = request.POST.get("time_start", settings.OPEN_TIME)
@@ -68,20 +77,23 @@ def booking_post(request):
     start_ts = datetimestring_to_ts(start, "%Y-%m-%d %H:%M")
     end_ts = datetimestring_to_ts(end, "%Y-%m-%d %H:%M")
 
-    if not resource_id:
+    if (not user_id) or (not resource_id):
         return None
 
     b = Booking.objects.create(
         resource_id=resource_id,
-        user=request.user,
+        user_id=user_id,
         start_ts=start_ts,
         end_ts=end_ts,
         confirmed=True
     )
 
-    data = serializers.serialize('json', [b, ])
-    result = json.loads(data)[0]
+    result = booking_to_json(b)
     return result
+
+
+def booking_put(request):
+    pass
 
 
 def booking_delete(request, id):

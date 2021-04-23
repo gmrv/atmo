@@ -81,3 +81,25 @@ def extuser_to_json(extuser, is_short=False):
             })
         result["booking_set"] = booking_arr
     return result
+
+
+def booking_to_json(booking):
+    result = {
+        "id": booking.id,
+        "created_at": booking.created_at,
+        "created_by": booking.created_by,
+        "changed_at": booking.changed_at,
+        "changed_by": booking.changed_by,
+        "resource": booking.resource_id,
+        "user": booking.user_id,
+        "start_ts": booking.start_ts,
+        "end_ts": booking.end_ts,
+        "confirmed": booking.confirmed,
+        "confirmed_at": booking.confirmed_at,
+        "confirmed_by": booking.confirmed_by,
+        "confirmation_pin": booking.confirmation_pin,
+        "event": booking.event_id,
+        "active": booking.active
+    }
+    return result
+

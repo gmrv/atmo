@@ -1,7 +1,7 @@
 from api.handlers import *
 from main.models.core import *
 from api.utils import *
-from django.utils import timezone
+from django.utils.timezone import localtime, now
 
 
 @login_required
@@ -66,7 +66,7 @@ def get_area_resource_list(request, area_id):
 
 
 @login_required
-def booking(request, id=None, username=None):
+def booking(request, id=None, date=None):
     """
     Обработка запросов связанных с объектом Бронирование (Booking). \r\n
     **GET**\r\n
@@ -92,7 +92,7 @@ def booking(request, id=None, username=None):
         /api/booking/1 - Удалить запись с идентификатором 1. \r\n
     """
     if request.method == "GET":
-        result = booking_get(request, id)
+        result = booking_get(request, id, date)
 
     elif request.method == "POST":
         result = booking_post(request)
@@ -106,12 +106,42 @@ def booking(request, id=None, username=None):
         result = booking_delete(request, id)
 
     else:
-        # 400 Bad Request
         JsonResponse({}, status=400, safe=False)
 
     response = get_response_template(code='ok', source=request.path, result=result)
     return JsonResponse(response, status=200, safe=False)
 
+
+@login_required
+def booking_confirmation(request, id, pin):
+    """
+    Подтверждение брони
+    PIN генерируется в момент создания брони и отправляется пользователю через email, sms или личный кабинет.
+    /api/booking/confirmation/1/0000 - Подтвердить бронь с идентификатором 1, код подтвержения 0000
+
+    """
+    result = {}
+    b = Booking.objects.get(pk=id)
+    if b.confirmation_pin == pin:
+        b.confirmed = True
+        b.confirmed_by = request.user.id
+        b.confirmed_at = localtime(now())
+        b.save()
+        result = booking_to_json(b)
+    else:
+        JsonResponse({}, status=400, safe=False)
+    response = get_response_template(code='ok', source=request.path, result=result)
+    return JsonResponse(response, status=200, safe=False)
+
+
+@login_required
+def resource(request):
+    pass
+
+
+@login_required
+def resource_by_area(request):
+    pass
 
 @login_required
 def user(request, id=None, username=None):
