@@ -12,8 +12,7 @@
       <div class="row">
 
         <div class="col s3">Площадка:</div>
-        <div class="col s9">{{ area.name }}</div>
-
+        <div id="id-div-area-name" class="col s9"></div>
       </div>
 
 
@@ -22,9 +21,7 @@
         <div class="col s3">Места:</div>
 
         <div class="col s9">
-              {% for s in seats %}
-                {{ s.name }};&nbsp;
-              {% endfor %}
+          <div id="id-div-seats"></div>
         </div>
 
       </div>
@@ -35,16 +32,14 @@
         <div class="col s3">Переговорные комнаты:</div>
 
         <div class="col s9">
-              {% for r in rooms %}
-                {{ r.name }} ({{ r.seats }});&nbsp;
-              {% endfor %}
+          <div id="id-div-rooms"></div>
         </div>
 
       </div>
 
-      <div id="row-map-container" class="row">
-        <div id="map-container" class="col s12">
-          <div w3-include-html="{{ area.map_url }}"></div>
+      <div class="row">
+        <div class="col s12">
+          <div id="id-div-map-container"></div>
         </div>
       </div>
 
@@ -56,9 +51,23 @@
     $(document).ready(function() {
       //includeHTML(setMapHandlers);
 
-      request('/api/resource/by_area/' + helper["user_company_id"], 'GET', fillResourceInfo)
+      request('/api/area/' + helper["user_default_area_id"], 'GET', fillPage)
 
     });
+
+    function fillPage(response){
+      let result = response.result
+      let area_name = result.name
+      let area_map = result.map_url
+      let rooms = result.resources.rooms
+      let seats = result.resources.seats
+      $("#id-div-area-name").text(area_name)
+      $("#id-div-seats").text(seats.length)
+      $("#id-div-rooms").text(rooms.length)
+      $("#id-div-map-container").html('<div w3-include-html="' + area_map + '"></div>')
+      includeHTML(setMapHandlers);
+    }
+
 
     function setMapHandlers(){
       $( "g[id^='table-']" ).on('click', function (e){
