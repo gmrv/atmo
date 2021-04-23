@@ -1,4 +1,4 @@
-function ajget(url, type, fn_ondone=function(){}, params=[]){
+function request(url, type, fn_ondone=function(){}, params=[]){
   log(`request for url: ${url}`);
   $.ajax({
     url: url,

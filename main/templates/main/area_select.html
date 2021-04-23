@@ -45,7 +45,7 @@
 {% block extrajs %}
   <script>
     $(document).ready(function(){
-      ajget('/api/area/{{ user.username }}', "GET", fillDropdown, null)
+      request('/api/area/{{ user.username }}', "GET", fillDropdown, null)
 
       // Обработка выбора площадки
       $('#id-select-area').on('change', function(){
@@ -55,7 +55,7 @@
       // Выбор площадки, переход на домашнюю страницу
       $('#id-button-choose').on('click', function(){
         let areaId = $("#id-select-area option:selected").val()
-        ajget('/api/user/set_default_area/' + areaId + '/{{ user.username }}', "GET", redirectToHome, null)
+        request('/api/user/set_default_area/' + areaId + '/{{ user.username }}', "GET", redirectToHome, null)
       })
 
       //

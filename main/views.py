@@ -28,7 +28,7 @@ def home(request):
         rooms.append({"id": r.id, "name": r.name, "seats": r.capacity })
 
     context = {
-        'user': request.user,
+        'user': request.user.extuser,
         'area': xuser.def_area,
         'seats': seats,
         'rooms': rooms,

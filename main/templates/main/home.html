@@ -49,17 +49,15 @@
       </div>
 
     </div>
-
-
-
 {% endblock %}
-
-{% block floating_content %}{% endblock %}
 
 {% block extrajs %}
   <script>
     $(document).ready(function() {
-      includeHTML(setMapHandlers);
+      //includeHTML(setMapHandlers);
+
+      request('/api/resource/by_area/' + helper["user_company_id"], 'GET', fillResourceInfo)
+
     });
 
     function setMapHandlers(){
@@ -69,7 +67,7 @@
           let seatNumber = e.currentTarget.id.split('-')[1]
         //  url = `/orb/ajax/get_seat_info/${roomId}/${seatNumber}/${date}`
           let url = '/api/user'
-          ajget(url, 'GET', function(d){log(d)});
+          request(url, 'GET', function(d){log(d)});
         //}
 
       })
