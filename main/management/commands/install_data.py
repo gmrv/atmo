@@ -52,7 +52,6 @@ class Command(BaseCommand):
         ras.area_set.add(a)
         ras.save()
 
-
         # Пользователи
 
         u = ExtUser.objects.create(username="root", is_staff=True, is_superuser=True)
@@ -78,5 +77,28 @@ class Command(BaseCommand):
             first_name="Сидор", middle_name="Сидорович", last_name="Сидоров")
         u.set_password("1234")
         u.save()
+
+        # Брони
+
+        tz = tzlocal()
+        target_date = localtime(now()).date()
+        Booking.objects.create(
+            resource=Seat.objects.first(),
+            user=u,
+            start_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=9, minute=0, tzinfo=tz),
+            end_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=13, minute=0, tzinfo=tz)
+        )
+        Booking.objects.create(
+            resource=Seat.objects.first(),
+            user=u,
+            start_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=14, minute=0, tzinfo=tz),
+            end_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=16, minute=0, tzinfo=tz)
+        )
+        Booking.objects.create(
+            resource=Seat.objects.filter(name='02').first(),
+            user=u,
+            start_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=8, minute=0, tzinfo=tz),
+            end_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=19, minute=0, tzinfo=tz)
+        )
 
 
