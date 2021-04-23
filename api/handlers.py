@@ -24,7 +24,7 @@ def area_get(request, id, username):
         for r in resource_set:
             res_arr.append({"id": r.id, "type": r.type,"name": r.name})
 
-        result = {"id": a.id, "name": a.name, "resource_set": res_arr}
+        result = a.to_json()
 
     else:
         # Если нет идентификатора возвращаем все
@@ -35,7 +35,7 @@ def area_get(request, id, username):
             area_query = area_query.exclude(~Q(company=xuser.company))
         area_list = []
         for a in area_query:
-            area_list.append({"id": a.id, "name": a.name})
+            area_list.append(a.to_json(is_short=True))
         result = area_list
     return result
 
@@ -116,9 +116,9 @@ def resource_get(request, resource_id=None, area_id=None):
         return r.to_json()
     else:
         if area_id:
-            resource_query = Area.objects.get(pk=area_id).resource_set.all()
+            resource_query = Area.objects.get(pk=area_id).resource_set.all().order_by("name")
         else:
-            resource_query = Resource.objects.all()
+            resource_query = Resource.objects.all().order_by("name")
         seats_list = []
         rooms_list = []
         for r in resource_query:

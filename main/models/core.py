@@ -45,6 +45,23 @@ class Area(Common):
     def __str__(self):
         return ("%s::%s (id: %s);"  % (self.type, self.name, self.id))
 
+    def to_json(self, is_short=False):
+        result={
+            "id": self.id,
+            "name": self.name,
+            "type": self.type,
+            "map_url": self.map_url,
+            "company": self.company_id,
+            "resources": {} if is_short else self.get_resources_json()
+        }
+        return result
+
+    def get_resources_json(self):
+        result = []
+        for r in self.resource_set.all():
+            result.append(r.to_json(is_short=True))
+        return result
+
 
 class ExtUser(User):
     """
