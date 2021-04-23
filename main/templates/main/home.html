@@ -65,9 +65,8 @@
       $("#id-div-seats").text(seats.length)
       $("#id-div-rooms").text(rooms.length)
       $("#id-div-map-container").html('<div w3-include-html="' + area_map + '"></div>')
-      includeHTML(setMapHandlers);
+      includeHTML(getResource);
     }
-
 
     function setMapHandlers(){
       $( "g[id^='table-']" ).on('click', function (e){
@@ -80,6 +79,36 @@
         //}
 
       })
+    }
+
+    function getResource(){
+      request('/api/area/' + helper["user_default_area_id"], 'GET', paintSeats)
+      setMapHandlers()
+    }
+
+
+    function paintSeats(response){
+        seatsDict = response.result.resources.seats;
+        for (var key in seatsDict) {
+            circleName = '#' + 'circle-' + seatsDict[key]['name']
+            rectName = '#' + 'rect-' + seatsDict[key]['name']
+            tableName = '#' + 'table-' + seatsDict[key]['name']
+            if(seatsDict[key]['percent_of_booked_time'] > 0) {
+              $(circleName)[0].style.fill = 'pink'
+              if (seatsDict[key]['percent_of_booked_time'] > 90) {
+                $(rectName)[0].style.fill = 'pink'
+              }
+              $(tableName).addClass('booked')
+            }else if(seatsDict[key]['status'] == 'persisted'){
+              $(circleName)[0].style.fill = 'gray'
+              $(rectName)[0].style.fill = 'gray'
+              $(tableName).addClass('booked')
+            }else{
+                $(circleName)[0].style.fill = '#003274'
+                $(rectName)[0].style.fill = 'white'
+                $(tableName).removeClass('booked')
+            }
+        }
     }
 
   </script>
