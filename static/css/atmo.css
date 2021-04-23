@@ -54,3 +54,7 @@ a:hover {
 nav {
     margin-bottom: 1vh;
 }
+
+.booked {
+    cursor: pointer;
+}

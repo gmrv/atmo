@@ -1,0 +1,56 @@
+{% extends 'main/base.html' %}
+{% load static %}
+{% load i18n %}
+{% block sub-title %}Добро пожаловать{% endblock %}
+
+{% block style %}{% endblock %}
+
+{% block content %}
+    <div class="container">
+
+
+      <div class="row">
+
+        <div class="col s3">Площадка:</div>
+        <div id="id-div-area-name" class="col s9"></div>
+      </div>
+
+
+      <div class="row">
+        <div class="col s3">Ресурс: {{ resource.name }}  </div>
+        <div class="col s3">{{ resource.type }}</div>
+      </div>
+
+      <div class="row">
+        <div class="col s3">Процент брони: </div><div class="col s3">{{ resource.get_percent_of_booked_time }}</div>
+      </div>
+
+      {% for c in resource.get_calendar %}
+        <div class="row">
+
+          <div class="col s3">
+                {{ c.mil_hour }}:{{ c.minutes }}
+          </div>
+
+          {% if c.reserved  %}
+            <div class="col s3" style="background-color: pink">
+              забронировано
+            </div>
+          {% else %}
+            <div class="col s3" style="background-color: greenyellow">
+              свободно
+            </div>
+          {% endif %}
+
+        </div>
+      {% endfor %}
+
+    </div>
+{% endblock %}
+
+{% block extrajs %}
+  <script>
+    $(document).ready(function() {
+    });
+  </script>
+{% endblock %}

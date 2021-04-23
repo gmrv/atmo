@@ -72,12 +72,12 @@
       $( "g[id^='table-']" ).on('click', function (e){
         //if(e.currentTarget.classList.contains('booked')){
         //  let date = $('#date-picker')[0].value
-          let seatNumber = e.currentTarget.id.split('-')[1]
+          let seatId = $(e.currentTarget).data()["id"]
         //  url = `/orb/ajax/get_seat_info/${roomId}/${seatNumber}/${date}`
-          let url = '/api/user'
-          request(url, 'GET', function(d){log(d)});
+          //let url = '/api/user'
+          //request(url, 'GET', function(d){log(d)});
         //}
-
+        window.location.href = '/main/booking/' + seatId;
       })
     }
 
@@ -93,6 +93,8 @@
             circleName = '#' + 'circle-' + seatsDict[key]['name']
             rectName = '#' + 'rect-' + seatsDict[key]['name']
             tableName = '#' + 'table-' + seatsDict[key]['name']
+            $(tableName)[0].style.cursor = 'pointer'
+            $(tableName).data("id", seatsDict[key]['id'])
             if(seatsDict[key]['percent_of_booked_time'] > 0) {
               $(circleName)[0].style.fill = 'pink'
               if (seatsDict[key]['percent_of_booked_time'] > 90) {

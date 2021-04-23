@@ -36,6 +36,17 @@ def home(request):
     }
     return render(request, 'main/home.html', context)
 
+@login_required
+def booking(request, resource_id):
+    xuser = request.user.extuser
+    resource = Resource.objects.get(pk=resource_id)
+
+    context = {
+        'user': request.user.extuser,
+        'area': xuser.def_area,
+        'resource': resource,
+    }
+    return render(request, 'main/booking.html', context)
 
 @login_required
 def area_select(request):
