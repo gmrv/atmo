@@ -45,27 +45,6 @@ def area(request, id=None, username=None):
 
 
 @login_required
-def get_area_resource_list(request, area_id):
-    """
-    Список ресурсов закрепленных для площадки, сгруппированный по типам (seat, room)    \r\n
-    /api/get_area_resource_list/1                                                       \r\n
-    """
-    area = Area.objects.get(pk=area_id)
-    seats_list = []
-    rooms_list = []
-    for r in area.resource_set.all():
-        if r.type == Resource.RESOURCE_TYPE_SEAT:
-            seats_list.append({"id" : r.id, "name": r.name, "calendar": r.get_calendar()})
-        else:
-            rooms_list.append({"id": r.id, "name": r.name, "calendar": r.get_calendar()})
-
-    result = {"seats": seats_list, "rooms": rooms_list}
-    response = get_response_template(code='ok', source=request.path, result=result)
-
-    return JsonResponse(response, status=200, safe=False)
-
-
-@login_required
 def booking(request, id=None, date=None):
     """
     Обработка запросов связанных с объектом Бронирование (Booking). \r\n
@@ -135,13 +114,41 @@ def booking_confirmation(request, id, pin):
 
 
 @login_required
-def resource(request):
-    pass
+def resource(request, r_id=None):
+    """
+    Обработка запросов связанных с объектом Ресурс (Resource)                                   \r\n
+    Resource это родительский класс для Seat и Room                                             \r\n
+    Все основые операции (бронирование ...) выполняются через этот класс                        \r\n
+    **GET**                                                                                     \r\n
+        Получение одного объекта если всех объектов                                             \r\n
+        /api/resource           - Получить всех пользователей;                                      \r\n
+        /api/resource/1         - Получить пользователя с id = 1;                                   \r\n
+        /api/resource/ivanov-ii - Получить пользователя с username = ivanov-ii;                     \r\n
+    """
+    result = None
+    if request.method == "GET":
+        result = resource_get(request, resource_id=r_id)
+    else:
+        return JsonResponse({}, status=400, safe=False)
+
+    if not result:
+        return JsonResponse({}, status=400, safe=False)
+
+    response = get_response_template(code='ok', source=request.path, result=result)
+    return JsonResponse(response, status=200, safe=False)
 
 
 @login_required
-def resource_by_area(request):
-    pass
+def resource_by_area(request, area_id):
+    if area_id:
+        if Area.objects.filter(pk=area_id).count() < 1:
+            return JsonResponse({}, status=400, safe=False)
+        result = resource_get(request, area_id=area_id)
+    else:
+        return JsonResponse({}, status=400, safe=False)
+    response = get_response_template(code='ok', source=request.path, result=result)
+    return JsonResponse(response, status=200, safe=False)
+
 
 @login_required
 def user(request, id=None, username=None):

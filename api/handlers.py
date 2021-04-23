@@ -105,6 +105,34 @@ def booking_delete(request, id):
     return {"id": id}
 
 
+def resource_get(request, resource_id=None, area_id=None):
+    """
+    Получаем один или все ресурсы
+    Если задан area_id получаем все ресурсы закрепленные за этой площадкой
+    """
+    if resource_id:
+        if Resource.objects.filter(pk=resource_id).count() < 1:
+            return None
+        r = Resource.objects.get(pk=resource_id)
+        return r.to_json()
+    else:
+        if area_id:
+            resource_query = Area.objects.get(pk=area_id).resource_set.all()
+        else:
+            resource_query = Resource.objects.all()
+        seats_list = []
+        rooms_list = []
+        for r in resource_query:
+            if r.type == Resource.RESOURCE_TYPE_SEAT:
+                seats_list.append(r.to_json())
+            elif r.type == Resource.RESOURCE_TYPE_ROOM:
+                rooms_list.append(r.to_json())
+            else:
+                pass
+        result = {"seats": seats_list, "rooms": rooms_list}
+        return result
+
+
 def user_get(request, id, username):
     """
     Получаем одного или всех пользователей

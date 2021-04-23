@@ -154,12 +154,29 @@ class Resource(Common):
                     block['reserved'] = True
         return calendar
 
+    def to_json(self):
+        if hasattr(self, 'room'):
+            return self.room.to_json()
+        if hasattr(self, 'seat'):
+            return self.seat.to_json()
+
 
 class Room(Resource):
     """
     Переговорные
     """
     capacity = models.SmallIntegerField(help_text= 'Количество сидячих мест', default=0)
+
+    def to_json(self):
+        result = {
+            "id": self.id,
+            "name": self.name,
+            "type": self.type,
+            "area": self.area_id,
+            "capacity": self.capacity,
+            "calendar": self.get_calendar()
+        }
+        return result
 
 
 class Seat(Resource):
@@ -168,6 +185,17 @@ class Seat(Resource):
     """
     persisted = models.BooleanField(help_text= 'Постоянное место', blank=True, default=False)
     owner = models.ForeignKey(User, help_text= 'За кем закреплено', on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
+    def to_json(self):
+        result = {
+            "id": self.id,
+            "name": self.name,
+            "type": self.type,
+            "area": self.area_id,
+            "persisted": self.persisted,
+            "owner": self.owner_id,
+            "calendar": self.get_calendar()
+        }
+        return result
 
 
 class Event(Common):
