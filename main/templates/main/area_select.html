@@ -50,7 +50,7 @@
 {% block extrajs %}
   <script>
     $(document).ready(function(){
-      ajget('/api/area/get_area_by_username/{{ user.username }}', "GET", fillDropdown, null)
+      ajget('/api/area/{{ user.username }}', "GET", fillDropdown, null)
 
       // Обработка выбора площадки
       $('#id-select-area').on('change', function(){
@@ -66,11 +66,11 @@
       // Выбор площадки, переход на домашнюю страницу
       $('#id-button-test').on('click', function(){
         $.ajax({
-          url: '/api/user',
-          type: "PUT",
-          data: {"username":"petrov-pp", "email":"petrov-pp@example.com"},
+          url: '/api/booking',
+          type: "POST",
+          {#data: {"username":"petrov-pp", "email":"petrov-pp@example.com"},#}
           {#data: {"username":"olegov-oo", "password": "1234", "first_name": "Олег", "middle_name": "Олегович", "last_name": "Олегов", "email":"olegov-oo@example.com"},#}
-          {#data: {"user_id":1, "resource_id":1},#}
+          data: {"user_id":1, "resource_id":3},
           {#data: {"user_id":1, "resource_id":1, "date_start": "2021-04-21", "time_start": "12:00", "date_end": "2021-04-21", "time_end": "15:00"},#}
           success: function(data){log(data)},
           dataType: "json"
