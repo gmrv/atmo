@@ -57,9 +57,12 @@ class Area(Common):
         return result
 
     def get_resources_json(self):
-        result = []
+        result = {
+            "rooms": [],
+            "seats": []
+        }
         for r in self.resource_set.all():
-            result.append(r.to_json(is_short=True))
+                result[r.type + "s"].append(r.to_json(is_short=True))
         return result
 
 

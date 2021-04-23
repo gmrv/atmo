@@ -19,11 +19,6 @@ def area_get(request, id, username):
     if id:
         # Если есть идентификатор возвращаем одну
         a = Area.objects.get(pk=id)
-        resource_set = a.resource_set.all()
-        res_arr = []
-        for r in resource_set:
-            res_arr.append({"id": r.id, "type": r.type,"name": r.name})
-
         result = a.to_json()
 
     else:
