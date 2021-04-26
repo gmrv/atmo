@@ -38,8 +38,15 @@
       </div>
 
       <div class="row">
-        <div class="col s12">
-          <div id="id-div-map-container"></div>
+        <div class="col s12" >
+
+          <div id="id-progress-map" class="progress">
+                <div class="indeterminate"></div>
+          </div>
+
+          <div id="id-div-map-container">
+          </div>
+
         </div>
       </div>
 
@@ -51,7 +58,7 @@
     $(document).ready(function() {
       //includeHTML(setMapHandlers);
 
-      request('/api/area/' + helper["user_default_area_id"], 'GET', fillPage)
+      request({url:'/api/area/' + helper["user_default_area_id"], type:'GET', ondone:fillPage})
 
     });
 
@@ -64,33 +71,72 @@
       $("#id-div-area-name").text(area_name)
       $("#id-div-seats").text(seats.length)
       $("#id-div-rooms").text(rooms.length)
-      $("#id-div-map-container").html('<div w3-include-html="' + area_map + '"></div>')
+      $("#id-div-map-container").html('<div w3-include-html="' + area_map + '?a=3"></div>')
+      switchMapLoading(true);
       includeHTML(getResource);
+    }
+
+    function getResource(){
+      request({url:'/api/area/' + helper["user_default_area_id"], type:'GET', ondone:markAll})
+      setMapHandlers()
     }
 
     function setMapHandlers(){
       $( "g[id^='table-']" ).on('click', function (e){
-        //if(e.currentTarget.classList.contains('booked')){
-        //  let date = $('#date-picker')[0].value
-          let seatId = $(e.currentTarget).data()["id"]
-        //  url = `/orb/ajax/get_seat_info/${roomId}/${seatNumber}/${date}`
-          //let url = '/api/user'
-          //request(url, 'GET', function(d){log(d)});
-        //}
-        window.location.href = '/main/booking/' + seatId;
+        let seatId = $(e.currentTarget).data()["id"]
+        window.location.href = '/main/booking/' + seatId + '/' + helper.target_date;
       })
     }
 
-    function getResource(){
-      request('/api/area/' + helper["user_default_area_id"], 'GET', paintSeats)
-      setMapHandlers()
+    function markAll(response) {
+      let seats = response.result.resources.seats;
+      let rooms = response.result.resources.rooms;
+      markResource(seats)
+      markResource(rooms)
+      switchMapLoading(false)
     }
 
+    function markResource(resourceDict){
+      for (let key in resourceDict) {
+        let circleName = '#' + 'circle-' + resourceDict[key]['name']
+        let rectName = '#' + 'rect-' + resourceDict[key]['name']
+        let tableName = '#' + 'table-' + resourceDict[key]['name']
+        $(tableName)[0].style.cursor = 'pointer'
+        $(tableName).data("id", resourceDict[key]['id'])
+        if(resourceDict[key]['percent_of_booked_time'] > 0) {
+          $(circleName)[0].style.fill = 'pink'
+          if (resourceDict[key]['percent_of_booked_time'] > 90) {
+            $(rectName)[0].style.fill = 'pink'
+          }
+          $(tableName).addClass('booked')
+        }else if(resourceDict[key]['status'] == 'persisted'){
+          $(circleName)[0].style.fill = 'gray'
+          $(rectName)[0].style.fill = 'gray'
+          $(tableName).addClass('booked')
+        }else{
+          $(circleName)[0].style.fill = '#003274'
+          $(rectName)[0].style.fill = 'white'
+          $(tableName).removeClass('booked')
+        }
+      }
+    }
 
     function onChangeDatepickerTarget(e){
       let url = "/api/area/" + helper.user_default_area_id + "/" + helper.target_date
-      request({url: url, type:'GET', ondone:paintSeats})
+      request({url: url, type:'GET', ondone:markAll})
     }
+
+    function switchMapLoading(on=true){
+      if(on){
+        $("#id-progress-map").css("display", "block")
+        $("#id-div-map-container").css("display", "none")
+      }else{
+        $("#id-progress-map").css("display", "none")
+        $("#id-div-map-container").css("display", "block")
+      }
+    }
+
+
 
   </script>
 {% endblock %}
