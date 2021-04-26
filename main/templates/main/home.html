@@ -10,7 +10,6 @@
 
 
       <div class="row">
-
         <div class="col s3">Площадка:</div>
         <div id="id-div-area-name" class="col s9"></div>
       </div>
@@ -56,7 +55,8 @@
 {% block extrajs %}
   <script>
     $(document).ready(function() {
-      request({url:'/api/area/' + helper["user_default_area_id"], type:'GET', ondone:fillPage})
+      let url = "/api/area/" + helper.user_default_area_id + "/" + helper.target_date
+      request({url:url, type:'GET', ondone:fillPage})
     });
 
     function fillPage(response){
@@ -78,7 +78,8 @@
     function getResource(){
       // Получаем список ресурсов для выбранной площадки.
       // В случае успеха вызываем функцию которая пометит ресурс в соответствии с его статусом занятости
-      request({url:'/api/area/' + helper["user_default_area_id"], type:'GET', ondone:markAll})
+      let url = "/api/area/" + helper.user_default_area_id + "/" + helper.target_date
+      request({url:url, type:'GET', ondone:markAll})
       setMapHandlers()
     }
 

@@ -82,6 +82,7 @@ color: white;
 }
 
 /*Booking page*/
+/**/
 .booked {
     background-color: pink;
 }
@@ -94,10 +95,7 @@ color: white;
     fill: #d1d1d1;
 }
 
-
-
 /*Map and resources*/
-
 .resource {
     cursor: pointer;
 }
@@ -116,4 +114,20 @@ color: white;
 
 .resource .persisted{
     fill: #d1d1d1;
+}
+
+.atmo-link {
+    cursor: pointer;
+}
+
+.row.valign-wrapper .col{
+    margin-left: 0px;
+}
+
+nav .datepicker-day-button {
+    color: rgba(0, 0, 0, 0.87);
+}
+
+nav .is-selected .datepicker-day-button{
+    color: #fff;
 }
