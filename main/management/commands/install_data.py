@@ -18,8 +18,8 @@ class Command(BaseCommand):
             m = Seat.objects.create(name=str(n).zfill(2))
             a.resource_set.add(m)
         a.save()
-        r1 = Room.objects.create(name='Переговорная A1', capacity=4)
-        r2 = Room.objects.create(name='Переговорная A2', capacity=4)
+        r1 = Room.objects.create(name='A1', capacity=4)
+        r2 = Room.objects.create(name='A2', capacity=4)
         a.resource_set.add(r1, r2)
         a.save()
         cos.area_set.add(a)
@@ -58,47 +58,58 @@ class Command(BaseCommand):
         u.set_password("1234")
         u.save()
 
-        u = ExtUser.objects.create(username="ivanov-ii", email="ivanov-ii@a.com", company=cos,
+        ivan = ExtUser.objects.create(username="ivanov-ii", email="ivanov-ii@a.com", company=cos,
             first_name="Иван", middle_name="Иванович", last_name="Иванов")
-        u.set_password("1234")
-        u.save()
+        ivan.set_password("1234")
+        ivan.save()
         # Бронируем постоянное место
-        r = u.company.area_set.get(pk=1).resource_set.get(name='01')
+        r = ivan.company.area_set.get(pk=1).resource_set.get(name='01')
         r.seat.persisted = True
-        r.seat.owner = u
+        r.seat.owner = ivan
         r.save()
 
-        u = ExtUser.objects.create(username="petrov-pp", email="petrov-pp@a.com", company=cos,
+        petr = ExtUser.objects.create(username="petrov-pp", email="petrov-pp@a.com", company=cos,
             first_name="Пётр", middle_name="Петрович", last_name="Петров")
-        u.set_password("1234")
-        u.save()
+        petr.set_password("1234")
+        petr.save()
 
-        u = ExtUser.objects.create(username="sidorov-ss", email="sidorov-ss@a.com", company=cos,
+        sidor = ExtUser.objects.create(username="sidorov-ss", email="sidorov-ss@a.com", company=cos,
             first_name="Сидор", middle_name="Сидорович", last_name="Сидоров")
-        u.set_password("1234")
-        u.save()
+        sidor.set_password("1234")
+        sidor.save()
 
         # Брони
 
         tz = tzlocal()
         target_date = localtime(now()).date()
+
         Booking.objects.create(
-            resource=Seat.objects.first(),
-            user=u,
+            resource=Seat.objects.filter(name='02').first(),
+            user=ivan,
             start_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=9, minute=0, tzinfo=tz),
             end_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=13, minute=0, tzinfo=tz)
         )
         Booking.objects.create(
-            resource=Seat.objects.first(),
-            user=u,
+            resource=Seat.objects.filter(name='02').first(),
+            user=petr,
             start_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=14, minute=0, tzinfo=tz),
             end_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=16, minute=0, tzinfo=tz)
         )
         Booking.objects.create(
             resource=Seat.objects.filter(name='02').first(),
-            user=u,
-            start_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=8, minute=0, tzinfo=tz),
+            user=sidor,
+            start_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=17, minute=0, tzinfo=tz),
             end_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=19, minute=0, tzinfo=tz)
         )
-
-
+        Booking.objects.create(
+            resource=Room.objects.filter(name="A1").first(),
+            user=ivan,
+            start_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=10, minute=0, tzinfo=tz),
+            end_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=11, minute=0, tzinfo=tz)
+        )
+        Booking.objects.create(
+            resource=Room.objects.filter(name="A2").first(),
+            user=ivan,
+            start_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=8, minute=0, tzinfo=tz),
+            end_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=18, minute=0, tzinfo=tz)
+        )
