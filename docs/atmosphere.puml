@@ -15,6 +15,10 @@ hide stereotypes
 
 'Компания
 'Вершина иерархии, текущий владелец проекта
+' short_name - короткое наименование
+' full_name - полное наименование
+' code - код предприятия
+' root_dir - путь к каталогу со статикой (логотипы, карты площадок и т.п.)
 table(Company){
     primary_key(id)
     not_null(name)
@@ -22,11 +26,12 @@ table(Company){
     not_null(full_name)
     not_null(code)
     not_null(root_dir)
-    owner
     areas [1..*]
 }
 
 'Площадки (Коворкинги)
+'map_url - Карта площадки в формате svg, с расширением *.html для включение в тело страницы
+'company - Компания которой пренадлежит площадка
 table(Area){
     primary_key(id)
     not_null(name)
@@ -51,25 +56,22 @@ table(Resource){
     not_null(type)
 }
 
-'Типы ресурсов
-'Переговорка, рабочее место, парковочное место, локкер и т.д.
-'Еще могут быть приватные ресурсы, личное рабочее место
-table(ResourceType){
+'Рабочее место
+' persisted - True если закреплено за конкретным сотрудником
+' owner - Сотрудник за которым закреплено место
+table(Seat){
     primary_key(id)
     not_null(name)
+    persisted
+    owner [1..1]user
 }
 
-'Свойства ресурса
-'Например для переговорки это может быть наличие проектора
-'name: Проектор; type: bool; value_bool: True
-table(Property){
+'Переговорная или кабинет
+'capacity - количество сидячих мест
+table(Room){
     primary_key(id)
     not_null(name)
-    not_null(type)
-    value_bool
-    value_real
-    value_int
-    value_text
+    capacity
 }
 
 'Записи о бронировании ресурсов
@@ -140,23 +142,23 @@ table(DjangoUser){
 Company *-- "1..*" Area
 Area *-- "1..*" Resource
 Area -- AreaType
-Resource -- ResourceType
-Resource *-- "0..*" Property
+Resource <|-- Seat
+Resource <|-- Room
 Booking -- DjangoUser
 Booking -- Resource
 Booking -- "0..1" Event
 Event -- "1..*" DjangoUser
 Request -- DjangoUser
 Request -- Resource
-DjangoUser *-- "1..1" ExtUser
+DjangoUser <|-- ExtUser
 
 /'
 object Legend {
     Company: Справочник предприятий, а также вершина иерархии, текущий владелец проекта
     Area : Коворкинги
     Resource: Ресурсы доступные в рамкках коворкинга (переговорки, места и т.п.)
-    ResourceType: Тип ресурса (переговорки, места и т.п.)
-    Property: Свойства ресурса (есть ли в переговорной проектор)
+    Seat:
+    Room:
     Booking: Таблица бронирования ресурсов
     Event: Событие связанное с бронированием. Например для переговорок описание собрания
     Request: Запрос пользователя к администрации коворкингда. Например на уборку места

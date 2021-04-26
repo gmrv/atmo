@@ -30,6 +30,8 @@ class Company(Common):
 class Area(Common):
     """
     Площадки (Коворкинги)
+    map_url - Карта площадки в формате svg, с расширением *.html для включение в тело страницы
+    company - Компания которой пренадлежит площадка
     """
     AREA_TYPE_COWORKING = 'cow'
     AREA_TYPE_FLOOR = 'flr'
@@ -122,6 +124,7 @@ class Notification(Common):
 class Resource(Common):
     """
     Ресурсы
+    Родительский объект для всех объектов которые могут быть забронированы
     """
     RESOURCE_TYPE_ALL = 'resource'
     RESOURCE_TYPE_SEAT = 'seat'
@@ -141,7 +144,10 @@ class Resource(Common):
         return ("Id: %s; Type: %s; Name: %s;" % (self.id, type, self.name))
 
     def get_raw_calendar(self):
-        # Calendar is a list of {hour, minute} time blocks
+        """
+        Календарь ресурса на день
+        Возвращает словарь временных отрезков с разбивкой по полчаса с открытия по закрытие
+        """
         calendar = []
 
         # Default OPEN_TIME is 8AM
@@ -178,6 +184,12 @@ class Resource(Common):
         return calendar
 
     def get_calendar(self, target_date=None):
+        """
+        Календарь ресурса бронирования ресурса на текущую дату
+        target_date - Дата за которую нужно получить календарь брони
+        Возвращает словарь временных отрезков с разбивкой по полчаса с открытия по закрытие
+        Помеченных в зависимости от их статуса занятости.
+        """
         if not target_date:
             target_date = localtime(now()).date()
         else:
@@ -185,7 +197,6 @@ class Resource(Common):
             date_arr = target_date.split('-')
             target_date = datetime(year=int(date_arr[0]), month=int(date_arr[1]), day=int(date_arr[2]))
 
-        # Start with the raw calendar
         calendar = self.get_raw_calendar()
 
         # Extract the start and end times from our target date and the raw calendar
@@ -196,13 +207,6 @@ class Resource(Common):
         start = datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=int(first_block['mil_hour']), minute=int(first_block['minutes']), tzinfo=tz) - booking_window
         end = datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=int(last_block['mil_hour']), minute=int(last_block['minutes']), tzinfo=tz) + booking_window
         end = end + timedelta(minutes=30)
-        # print("Start: %s, End: %s, TZ: %s" % (start, end, tz))
-
-        # Loop through the events for this day and mark which blocks are reserved
-        # We use time integers in the form of HOURMIN (830, 1600, etc) for comparison
-        #events = self.event_set.filter(room=self, start_ts__gte=start, end_ts__lte=end)
-        start_target_data = datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=int(8), minute=int(0), tzinfo=tz)
-        end_target_data = datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=int(19), minute=int(0), tzinfo=tz)
 
         bookings = self.booking_set.filter(resource=self, start_ts__gte=start, end_ts__lte=end)
         for booking in bookings:
@@ -216,6 +220,9 @@ class Resource(Common):
         return calendar
 
     def get_percent_of_booked_time(self, target_date=None):
+        """
+        Процент забронированного времени от доступного в пределах дня.
+        """
         if not target_date:
             target_date = localtime(now()).date()
         else:
@@ -249,7 +256,6 @@ class Resource(Common):
 
         return(round(booked_time.total_seconds()/all_time.total_seconds()*100, 2))
 
-
     def to_json(self, is_short=False, target_date=None):
         if hasattr(self, 'room'):
             return self.room.to_json(is_short, target_date)
@@ -260,6 +266,7 @@ class Resource(Common):
 class Room(Resource):
     """
     Переговорные
+    capacity - количество сидячих мест
     """
     capacity = models.SmallIntegerField(help_text= 'Количество сидячих мест', default=0)
 
@@ -279,9 +286,12 @@ class Room(Resource):
 class Seat(Resource):
     """
     Рабочие места
+    persisted - True если закреплено за конкретным сотрудником
+    owner - Сотрудник за которым закреплено место
     """
     persisted = models.BooleanField(help_text= 'Постоянное место', blank=True, default=False)
     owner = models.ForeignKey(User, help_text= 'За кем закреплено', on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
+
     def to_json(self, is_short=False, target_date=None):
         result = {
             "id": self.id,
