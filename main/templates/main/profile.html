@@ -10,6 +10,10 @@
     <div id="id-container-profile" class="container">
 
       <div class="row">
+        <div class="col s12"><h5>Основное:</h5></div>
+      </div>
+
+      <div class="row">
         <div class="col s3">ФИО:</div>
         <div class="col s3">{{ user.last_name }} {{ user.first_name }} {{ user.middle_name }}</div>
       </div>
@@ -24,19 +28,37 @@
         <div class="col s3">{{ user.company.name }}</div>
       </div>
 
-      <div class="row">
-        <div class="col s12"><h6>Бронирования</h6></div>
-      </div>
+      {% for s in user.seat_set.all %}
+
+        {% if forloop.first %}
+        <div class="row">
+          <div class="col s12"><h5>Постоянные места:</h5></div>
+        </div>
+        {% endif %}
+
+        <div class="row">
+          <div class="col s1">{{ s.name }}</div>
+          <div class="col s2">{{ s.type }}</div>
+        </div>
+
+      {% endfor %}
 
       {% for b in booking %}
-      <div class="row">
-        <div class="col s1">{{ b.resource.name }}</div>
-        <div class="col s2">{{ b.resource.type }}</div>
-        <div class="col s3">{{ b.start_ts }}</div>
-        <div class="col s3">{{ b.end_ts }}</div>
-        <div class="col s1">{{ b.confirmation_pin }}</div>
-        <div class="col s1"><div id="id-delete-{{ b.id }}" data-id="{{ b.id }}" class="booking-delete-button" href=""><i class="material-icons right">delete</i></div></div>
-      </div>
+
+        {% if forloop.first %}
+        <div class="row">
+          <div class="col s12"><h5>Бронирования:</h5></div>
+        </div>
+        {% endif %}
+
+        <div class="row">
+          <div class="col s1">{{ b.resource.name }}</div>
+          <div class="col s2">{{ b.resource.type }}</div>
+          <div class="col s3">{{ b.start_ts }}</div>
+          <div class="col s3">{{ b.end_ts }}</div>
+          <div class="col s1">{{ b.confirmation_pin }}</div>
+          <div class="col s1"><div id="id-delete-{{ b.id }}" data-id="{{ b.id }}" class="booking-delete-button" href=""><i class="material-icons right">delete</i></div></div>
+        </div>
 
       {% endfor %}
 
