@@ -143,4 +143,4 @@ SITE_NAME = "АТМОСФЕРА"
 # Local settings
 OPEN_TIME = '08:00'
 CLOSE_TIME = '19:00'
-BOOKING_WINDOW = 0 # days
+BOOKING_WINDOW = 7 # days

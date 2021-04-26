@@ -201,13 +201,16 @@ class Resource(Common):
         # Loop through the events for this day and mark which blocks are reserved
         # We use time integers in the form of HOURMIN (830, 1600, etc) for comparison
         #events = self.event_set.filter(room=self, start_ts__gte=start, end_ts__lte=end)
+        start_target_data = datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=int(8), minute=int(0), tzinfo=tz)
+        end_target_data = datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=int(19), minute=int(0), tzinfo=tz)
+
         bookings = self.booking_set.filter(resource=self, start_ts__gte=start, end_ts__lte=end)
         for booking in bookings:
-            start_int = int(localtime(booking.start_ts).strftime('%H%M'))
-            end_int = int(localtime(booking.end_ts).strftime('%H%M'))
+            start_ts = localtime(booking.start_ts)
+            end_ts = localtime(booking.end_ts)
             for block in calendar:
-                block_int = int(block['mil_hour'] + block['minutes'])
-                if start_int <= block_int and block_int < end_int:
+                block_ts = datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=int(block['mil_hour']), minute=int(block['minutes']), tzinfo=tz)
+                if start_ts <= block_ts and block_ts < end_ts:
                     block['reserved'] = True
                     block['user'] = booking.user.username
         return calendar
@@ -233,7 +236,16 @@ class Resource(Common):
 
         bookings = self.booking_set.filter(resource=self, start_ts__gte=day_start, end_ts__lte=day_end)
         for booking in bookings:
-            booked_time = booked_time + (booking.end_ts - booking.start_ts)
+            booking_start_ts = localtime(booking.start_ts)
+            booking_end_ts = localtime(booking.end_ts)
+            if booking.start_ts < open_time and booking.start_ts.day != target_date.day:
+                booking_start_ts = open_time
+            if booking.end_ts > close_time and booking.end_ts.day != target_date.day:
+                booking_end_ts = close_time
+
+            if (localtime(booking.start_ts) <= open_time and close_time < localtime(booking.end_ts)) or (booking.start_ts.day == target_date.day or booking.end_ts.day == target_date.day):
+                booked_time = booked_time + (booking_end_ts - booking_start_ts)
+
 
         return(round(booked_time.total_seconds()/all_time.total_seconds()*100, 2))
 
