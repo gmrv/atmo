@@ -42,6 +42,21 @@ def home(request, area_id=None):
     return render(request, 'main/home.html', context)
 
 @login_required
+def profile(request, target_date=None):
+    xuser = request.user.extuser
+
+    booking = xuser.booking_set.all()
+
+    context = {
+        'user': xuser,
+        'booking': booking,
+        'resource_id': '',
+    }
+    return render(request, 'main/profile.html', context)
+
+
+
+@login_required
 def booking(request, resource_id, target_date=None):
     xuser = request.user.extuser
     resource = Resource.objects.get(pk=resource_id)
