@@ -52,21 +52,22 @@
 
     <!-- Page  -->
     {% block top_nav %}
-<ul id="dropdown1" class="dropdown-content">
-  <li><a href="#!">one</a></li>
-  <li><a href="#!">two</a></li>
-  <li class="divider"></li>
-  <li><a href="#!">three</a></li>
-</ul>
+      <ul id="id-dropdown-areas" class="dropdown-content">
+        {% for a in user.company.area_set.all %}
+          <li><a href="/main/home/{{ a.id }}">{{ a.name }}</a></li>
+        {% endfor %}
+      </ul>
 
       <nav>
         <div class="nav-wrapper">
-          <a href="#" class="brand-logo right">Logo</a>
-          <ul id="nav-mobile" class="left hide-on-med-and-down">
-            <li><a href="/main/area_select">Площадки</a></li>
+          <a href="/main/home" class="brand-logo">Logo</a>
+          <ul id="nav-mobile" class="right hide-on-med-and-down">
             <!-- Dropdown Trigger -->
-            <li><a class="dropdown-trigger" href="#!" data-target="dropdown1">Dropdown<i class="material-icons right">arrow_drop_down</i></a></li>
+            <li><input id="id-datepicker-target" type="text" class="datepicker"></li>
+            <li><a href="/main/profile">Профиль</a></li>
+            <li><a class="dropdown-trigger" href="#!" data-target="id-dropdown-areas">Площадки<i class="material-icons right">arrow_drop_down</i></a></li>
             <li></li>
+            <li><a href="/main/home"><i class="material-icons right">home</i></a></li>
             <li><a href="/logout">Выход</a></li>
           </ul>
         </div>
@@ -115,17 +116,28 @@
       "user_id": "{{ user.id }}",
       "user_name": "{{ user.username }}",
       "user_company_id": "{{ user.company_id }}",
-      "user_default_area_id": "{{ user.def_area_id }}"
+      "user_default_area_id": "{{ user.def_area_id }}",
+      "target_date": "",
     }
 
     $(document).ready(function() {
+
+      // Инициализация контролов от Materialize
       $('select').formSelect();
       $('.sidenav').sidenav();
-      $(".dropdown-trigger").dropdown();
+      $('.dropdown-trigger').dropdown();
+      $('.datepicker').datepicker({
+        format: 'yyyy-mm-dd',
+        defaultDate: new Date(),
+        setDefaultDate: true,
+      });
+      helper.target_date = $('#id-datepicker-target').val();
+      $('.timepicker').timepicker({
+        "twelveHour": false
+      });
 
+      // Подключаем csrt-токен для пост запросов
       let csrftoken = document.getElementsByName('csrfmiddlewaretoken')[0].value;
-
-      // Подключаем токен для пост запросов
       $.ajaxSetup({
         beforeSend: function(xhr, settings) {
             if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
@@ -134,6 +146,12 @@
             }
         }
       });
+
+      //
+      $('#id-datepicker-target').on('change', function(e){
+        helper.target_date = $('#id-datepicker-target').val()
+        onChangeDatepickerTarget(e)
+      })
 
 
     });
