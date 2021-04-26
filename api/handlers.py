@@ -10,7 +10,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 
 
-def area_get(request, id, username):
+def area_get(request, id, username, target_date):
     """
     Получаем инфо площадки по ее id
     Получаем инфо о всех площадках если id не задан
@@ -19,7 +19,7 @@ def area_get(request, id, username):
     if id:
         # Если есть идентификатор возвращаем одну
         a = Area.objects.get(pk=id)
-        result = a.to_json()
+        result = a.to_json(is_short=False, target_date=target_date)
 
     else:
         # Если нет идентификатора возвращаем все
@@ -30,7 +30,7 @@ def area_get(request, id, username):
             area_query = area_query.exclude(~Q(company=xuser.company))
         area_list = []
         for a in area_query:
-            area_list.append(a.to_json(is_short=True))
+            area_list.append(a.to_json(is_short=True, target_date=target_date))
         result = area_list
     return result
 

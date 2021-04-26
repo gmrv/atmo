@@ -25,7 +25,7 @@ def home(request):
 
 
 @login_required
-def area(request, id=None, username=None):
+def area(request, id=None, username=None, target_date=None):
     """
     Обработка запросов связанных с объектом Площадка (Area).                                        \r\n
     Реализовано только получение т.к. остальные действия будут выполняться только через админку.    \r\n
@@ -36,7 +36,7 @@ def area(request, id=None, username=None):
         /api/area/ivanon-ii - Получаем дочерние площадки компании пользователя user.company.        \r\n
     """
     if request.method == "GET":
-        result = area_get(request, id, username)
+        result = area_get(request, id, username, target_date)
     else:
         return JsonResponse({}, status=400, safe=False)
 

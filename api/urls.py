@@ -11,6 +11,7 @@ urlpatterns = [
     # Area
     path('area', views.area, name='area'),
     path('area/<int:id>', views.area, name='area'),
+    path('area/<int:id>/<slug:target_date>', views.area, name='area'),
     path('area/<str:username>', views.area, name='area'),
 
 

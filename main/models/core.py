@@ -45,24 +45,24 @@ class Area(Common):
     def __str__(self):
         return ("%s::%s (id: %s);"  % (self.type, self.name, self.id))
 
-    def to_json(self, is_short=False):
+    def to_json(self, is_short=True, target_date=None):
         result={
             "id": self.id,
             "name": self.name,
             "type": self.type,
             "map_url": self.map_url,
             "company": self.company_id,
-            "resources": {} if is_short else self.get_resources_json()
+            "resources": {} if is_short else self.get_resources_json(is_short=is_short, target_date=target_date)
         }
         return result
 
-    def get_resources_json(self):
+    def get_resources_json(self, is_short=False, target_date=None):
         result = {
             "rooms": [],
             "seats": []
         }
         for r in self.resource_set.all():
-                result[r.type + "s"].append(r.to_json(is_short=False))
+                result[r.type + "s"].append(r.to_json(is_short, target_date))
         return result
 
 
@@ -180,6 +180,10 @@ class Resource(Common):
     def get_calendar(self, target_date=None):
         if not target_date:
             target_date = localtime(now()).date()
+        else:
+            # todo: переделать
+            date_arr = target_date.split('-')
+            target_date = datetime(year=int(date_arr[0]), month=int(date_arr[1]), day=int(date_arr[2]))
 
         # Start with the raw calendar
         calendar = self.get_raw_calendar()
@@ -188,8 +192,9 @@ class Resource(Common):
         first_block = calendar[0]
         last_block = calendar[len(calendar) - 1]
         tz = tzlocal()
-        start = datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=int(first_block['mil_hour']), minute=int(first_block['minutes']), tzinfo=tz)
-        end = datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=int(last_block['mil_hour']), minute=int(last_block['minutes']), tzinfo=tz)
+        booking_window = timedelta(days=settings.BOOKING_WINDOW)
+        start = datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=int(first_block['mil_hour']), minute=int(first_block['minutes']), tzinfo=tz) - booking_window
+        end = datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=int(last_block['mil_hour']), minute=int(last_block['minutes']), tzinfo=tz) + booking_window
         end = end + timedelta(minutes=30)
         # print("Start: %s, End: %s, TZ: %s" % (start, end, tz))
 
@@ -204,14 +209,21 @@ class Resource(Common):
                 block_int = int(block['mil_hour'] + block['minutes'])
                 if start_int <= block_int and block_int < end_int:
                     block['reserved'] = True
+                    block['user'] = booking.user.username
         return calendar
 
     def get_percent_of_booked_time(self, target_date=None):
         if not target_date:
             target_date = localtime(now()).date()
+        else:
+            # todo: переделать
+            date_arr = target_date.split('-')
+            target_date = datetime(year=int(date_arr[0]), month=int(date_arr[1]), day=int(date_arr[2]))
+
         tz = tzlocal()
-        day_start = datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=0, minute=0, tzinfo=tz)
-        day_end = datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=23, minute=59, tzinfo=tz)
+        booking_window = timedelta(days=settings.BOOKING_WINDOW)
+        day_start = datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=0, minute=0, tzinfo=tz) - booking_window
+        day_end = datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=23, minute=59, tzinfo=tz) + booking_window
 
         open_time = datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=int(settings.OPEN_TIME.split(":")[0]), minute=int(settings.OPEN_TIME.split(":")[1]), tzinfo=tz)
         close_time = datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=int(settings.CLOSE_TIME.split(":")[0]), minute=int(settings.CLOSE_TIME.split(":")[1]), tzinfo=tz)
@@ -226,11 +238,11 @@ class Resource(Common):
         return(round(booked_time.total_seconds()/all_time.total_seconds()*100, 2))
 
 
-    def to_json(self, is_short=False):
+    def to_json(self, is_short=False, target_date=None):
         if hasattr(self, 'room'):
-            return self.room.to_json(is_short)
+            return self.room.to_json(is_short, target_date)
         if hasattr(self, 'seat'):
-            return self.seat.to_json(is_short)
+            return self.seat.to_json(is_short, target_date)
 
 
 class Room(Resource):
@@ -239,15 +251,15 @@ class Room(Resource):
     """
     capacity = models.SmallIntegerField(help_text= 'Количество сидячих мест', default=0)
 
-    def to_json(self, is_short=False):
+    def to_json(self, is_short=False, target_date=None):
         result = {
             "id": self.id,
             "name": self.name,
             "type": self.type,
             "area": self.area_id,
             "capacity": self.capacity,
-            "calendar": {} if is_short else self.get_calendar(),
-            "percent_of_booked_time": self.get_percent_of_booked_time()
+            "calendar": {} if is_short else self.get_calendar(target_date),
+            "percent_of_booked_time": self.get_percent_of_booked_time(target_date)
         }
         return result
 
@@ -258,7 +270,7 @@ class Seat(Resource):
     """
     persisted = models.BooleanField(help_text= 'Постоянное место', blank=True, default=False)
     owner = models.ForeignKey(User, help_text= 'За кем закреплено', on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
-    def to_json(self, is_short=False):
+    def to_json(self, is_short=False, target_date=None):
         result = {
             "id": self.id,
             "name": self.name,
@@ -266,8 +278,8 @@ class Seat(Resource):
             "area": self.area_id,
             "persisted": self.persisted,
             "owner": self.owner_id,
-            "calendar": {} if is_short else self.get_calendar(),
-            "percent_of_booked_time": self.get_percent_of_booked_time()
+            "calendar": {} if is_short else self.get_calendar(target_date),
+            "percent_of_booked_time": self.get_percent_of_booked_time(target_date)
         }
         return result
 
