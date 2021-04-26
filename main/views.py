@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
+from api.utils import datetimestring_to_ts
 from main.models.core import *
 
 
@@ -11,13 +12,18 @@ def index(request):
 
 
 @login_required
-def home(request, area_id=None):
+def home(request, area_id=None, target_date=None):
     xuser = request.user.extuser
 
     if area_id:
         xuser.def_area_id = area_id
         xuser.save()
-        return HttpResponseRedirect(reverse('main:home'))
+        return HttpResponseRedirect("/main/home/" + target_date)
+
+    if target_date:
+        check = datetimestring_to_ts(target_date, "%Y-%m-%d")
+    else:
+        target_date = datetime.today().strftime('%Y-%m-%d')
 
     if not xuser.def_area:
         return HttpResponseRedirect(reverse('main:area_select'))
@@ -37,7 +43,7 @@ def home(request, area_id=None):
         'area': xuser.def_area,
         'seats': seats,
         'rooms': rooms,
-        'all_day': True,
+        'target_date': target_date
     }
     return render(request, 'main/home.html', context)
 
@@ -51,6 +57,7 @@ def profile(request, target_date=None):
         'user': xuser,
         'booking': booking,
         'resource_id': '',
+        'target_date': target_date
     }
     return render(request, 'main/profile.html', context)
 
@@ -93,5 +100,6 @@ def area_select(request):
     context = {
         'user': xuser,
         'areas': areas,
+        'target_date': datetime.today().strftime('%Y-%m-%d')
     }
     return render(request, 'main/area_select.html', context)
