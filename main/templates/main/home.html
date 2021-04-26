@@ -112,18 +112,24 @@
         let tableName = '#' + 'table-' + resourceDict[key]['name']
         $(tableName).addClass("resource")
         $(tableName).data("id", resourceDict[key]['id'])
-        if(resourceDict[key]['percent_of_booked_time'] > 0) {
+
+        if(resourceDict[key]['percent_of_booked_time'] > 90) {
           $(circleName).addClass("booked")
-          if (resourceDict[key]['percent_of_booked_time'] > 90) {
-            $(rectName).addClass("booked")
-          }
-        }else if(resourceDict[key]['persisted']){
-          $(circleName).addClass("persisted")
-          $(rectName).addClass("persisted")
-        }else{
+          $(rectName).addClass("booked")
+        }else if (resourceDict[key]['percent_of_booked_time'] > 0) {
+          $(circleName).addClass("booked")
+          $(rectName).removeClass("booked", "persisted")
+        } else {
           $(circleName).removeClass("booked", "persisted")
           $(rectName).removeClass("booked", "persisted")
         }
+
+        if(resourceDict[key]['persisted']) {
+          $(circleName).addClass("persisted")
+          $(rectName).addClass("persisted")
+        }
+
+
       }
     }
 
