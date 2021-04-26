@@ -102,6 +102,12 @@ class Command(BaseCommand):
             end_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=19, minute=0, tzinfo=tz)
         )
         Booking.objects.create(
+            resource=Seat.objects.filter(name='03').first(),
+            user=sidor,
+            start_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=15, minute=0, tzinfo=tz) - timedelta(days=1),
+            end_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=16, minute=0, tzinfo=tz)  + timedelta(days=2)
+        )
+        Booking.objects.create(
             resource=Room.objects.filter(name="A1").first(),
             user=ivan,
             start_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=10, minute=0, tzinfo=tz),
