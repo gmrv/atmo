@@ -56,13 +56,12 @@
 {% block extrajs %}
   <script>
     $(document).ready(function() {
-      //includeHTML(setMapHandlers);
-
       request({url:'/api/area/' + helper["user_default_area_id"], type:'GET', ondone:fillPage})
-
     });
 
     function fillPage(response){
+      // Заполням основные поля на домашней странице
+      // важно: заполняется тег w3-include-html урлом карты, которая потом будет включена в html страницы
       let result = response.result
       let area_name = result.name
       let area_map = result.map_url
@@ -77,11 +76,14 @@
     }
 
     function getResource(){
+      // Получаем список ресурсов для выбранной площадки.
+      // В случае успеха вызываем функцию которая пометит ресурс в соответствии с его статусом занятости
       request({url:'/api/area/' + helper["user_default_area_id"], type:'GET', ondone:markAll})
       setMapHandlers()
     }
 
     function setMapHandlers(){
+      // Подключаем обработку клика по объектам карты
       $( "g[id^='table-']" ).on('click', function (e){
         let seatId = $(e.currentTarget).data()["id"]
         window.location.href = '/main/booking/' + seatId + '/' + helper.target_date;
@@ -97,26 +99,30 @@
     }
 
     function markResource(resourceDict){
+      // Помечаем ресурсы в соответствии с их статусом занятости
+      // Пример записи ресурса в svg:
+      //<g id="table-20">
+      //  <polyline id="rect-20" points="183.4,448.7 216.9,448.7 216.9,515.8 183.4,515.8 183.4,448.7 				"/>
+      //  <circle id="circle-20" cx="200.3" cy="480.8" r="13.4"/>
+      //  <text>20</text>
+      //</g>
       for (let key in resourceDict) {
         let circleName = '#' + 'circle-' + resourceDict[key]['name']
         let rectName = '#' + 'rect-' + resourceDict[key]['name']
         let tableName = '#' + 'table-' + resourceDict[key]['name']
-        $(tableName)[0].style.cursor = 'pointer'
+        $(tableName).addClass("resource")
         $(tableName).data("id", resourceDict[key]['id'])
         if(resourceDict[key]['percent_of_booked_time'] > 0) {
-          $(circleName)[0].style.fill = 'pink'
+          $(circleName).addClass("booked")
           if (resourceDict[key]['percent_of_booked_time'] > 90) {
-            $(rectName)[0].style.fill = 'pink'
+            $(rectName).addClass("booked")
           }
-          $(tableName).addClass('booked')
-        }else if(resourceDict[key]['status'] == 'persisted'){
-          $(circleName)[0].style.fill = 'gray'
-          $(rectName)[0].style.fill = 'gray'
-          $(tableName).addClass('booked')
+        }else if(resourceDict[key]['persisted']){
+          $(circleName).addClass("persisted")
+          $(rectName).addClass("persisted")
         }else{
-          $(circleName)[0].style.fill = '#003274'
-          $(rectName)[0].style.fill = 'white'
-          $(tableName).removeClass('booked')
+          $(circleName).removeClass("booked", "persisted")
+          $(rectName).removeClass("booked", "persisted")
         }
       }
     }
@@ -127,6 +133,7 @@
     }
 
     function switchMapLoading(on=true){
+      // Переключение между показом кары и прогресс бара
       if(on){
         $("#id-progress-map").css("display", "block")
         $("#id-div-map-container").css("display", "none")

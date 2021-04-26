@@ -80,3 +80,26 @@ color: white;
     cursor: pointer;
     margin-top: -3px;
 }
+
+
+/*Map and resources*/
+
+.resource {
+    cursor: pointer;
+}
+
+.resource .booked{
+    fill: pink;
+}
+
+.resource .free{
+    fill: #003274;
+}
+
+.resource rect .free{
+    fill: white;
+}
+
+.resource .persisted{
+    fill: #d1d1d1;
+}
