@@ -66,6 +66,7 @@ def profile(request, target_date=None):
 @login_required
 def booking(request, resource_id, target_date=None):
     xuser = request.user.extuser
+    xusers = ExtUser.objects.all().exclude(username='root')
     resource = Resource.objects.get(pk=resource_id)
     percent_of_booked_time = resource.get_percent_of_booked_time(target_date)
 
@@ -75,6 +76,7 @@ def booking(request, resource_id, target_date=None):
 
     context = {
         'user': xuser,
+        'users': xusers,
         'area': xuser.def_area,
         'resource': resource,
         'calendar': calendar,

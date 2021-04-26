@@ -65,23 +65,62 @@
 
             {% if resource.seat.persisted %}
 
-            <div class="row">
+            <div class="row valign-wrapper">
               <div class="col s12">Постоянное место</div>
             </div>
 
             {% else %}
 
-            <div class="row">
-              <div class="col s4"><input id="id-datepicker-start" type="text" class="datepicker"> </div>
-              <div class="col s2"></div>
-              <div class="col s4"><input id="id-timepicker-start" type="text" class="timepicker" value="{% settings_value 'OPEN_TIME' %}"></div>
+            <div class="row valign-wrapper">
+              <div class="col s12">Параметры бронирования</div>
             </div>
 
-            <div class="row">
-              <div class="col s4"><input id="id-datepicker-end"  type="text" class="datepicker"></div>
-              <div class="col s2"></div>
-              <div class="col s4"><input id="id-timepicker-end"  type="text" class="timepicker" value="{% settings_value 'CLOSE_TIME' %}"></div>
+            <div class="row valign-wrapper">
+              <div class="input-field col s5">
+                <input id="id-datepicker-start" type="text" class="datepicker">
+                <label>Дата начала</label>
+              </div>
+              <div class="col s1"></div>
+              <div class="input-field col s5">
+                <input id="id-timepicker-start" type="text" class="timepicker" value="{% settings_value 'OPEN_TIME' %}">
+                <label>Время начала</label>
+              </div>
             </div>
+
+            <div class="row valign-wrapper">
+              <div class="input-field col s5">
+                <input id="id-datepicker-end"  type="text" class="datepicker">
+                <label>Дата окончания</label>
+              </div>
+              <div class="col s1"></div>
+              <div class="input-field col s5">
+                <input id="id-timepicker-end"  type="text" class="timepicker" value="{% settings_value 'CLOSE_TIME' %}">
+                <label>Время окончания</label>
+              </div>
+            </div>
+
+            {% if resource.type == 'room' %}
+              <div class="row valign-wrapper">
+                <div class="input-field col s12">
+                  <input id="id-input-event"  type="text">
+                  <label>Событие</label>
+                </div>
+              </div>
+
+              <div class="row valign-wrapper">
+                <div class="col s12">
+                  <div class="input-field col s12" id="id-input-partisipants">
+                    <select multiple>
+                      <option value="" disabled selected>Выберите участников</option>
+                      {% for u in users %}
+                        <option value="{{ u.id }}">{{ u.first_name }} {{ u.middle_name }} {{ u.last_name }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+            {% endif %}
 
             <div class="row">
               <div class="col s12">&nbsp;</div>
@@ -106,12 +145,6 @@
     let flag = false
     $(document).ready(function() {
 
-      $('.datepicker').datepicker({
-        format: 'yyyy-mm-dd',
-        defaultDate: new Date("{{ target_date }}",),
-        setDefaultDate: true,
-      });
-
       $("#id-button-booking").on('click', function(e){
         let data = {
           "user_id": helper.user_id,
@@ -119,7 +152,8 @@
           "date_start": $("#id-datepicker-start").val(),
           "time_start": $("#id-timepicker-start").val(),
           "date_end": $("#id-datepicker-end").val(),
-          "time_end": $("#id-timepicker-end").val()
+          "time_end": $("#id-timepicker-end").val(),
+          "event": $("#id-input-event").val()
         }
         request({url:'/api/booking', type:'POST', data:data, ondone:onBookingSuccess})
       })
