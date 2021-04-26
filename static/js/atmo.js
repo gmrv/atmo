@@ -1,8 +1,9 @@
-function request(url, type, fn_ondone=function(){}, params=[]){
+function request({url, type, data={}, ondone=function(){}, params=[]}){
   log(`request for url: ${url}`);
   $.ajax({
     url: url,
     type: type,
+    data: data,
     cache: false,
     statusCode: {
       400: function() {
@@ -21,7 +22,7 @@ function request(url, type, fn_ondone=function(){}, params=[]){
   })
   .done(function (resp) {
     log(resp);
-    fn_ondone(resp, params)
+    ondone(resp, params)
   });
 }
 

@@ -45,7 +45,7 @@
 {% block extrajs %}
   <script>
     $(document).ready(function(){
-      request('/api/area/{{ user.username }}', "GET", fillDropdown, null)
+      request({url:'/api/area/{{ user.username }}', type:"GET", ondone:fillDropdown})
 
       // Обработка выбора площадки
       $('#id-select-area').on('change', function(){
@@ -55,18 +55,18 @@
       // Выбор площадки, переход на домашнюю страницу
       $('#id-button-choose').on('click', function(){
         let areaId = $("#id-select-area option:selected").val()
-        request('/api/user/set_default_area/' + areaId + '/{{ user.username }}', "GET", redirectToHome, null)
+        request({url:'/api/user/set_default_area/' + areaId + '/{{ user.username }}', type:"GET", ondone:redirectToHome})
       })
 
       //
       $('#id-button-test').on('click', function(){
         $.ajax({
-          url: '/api/booking',
+          url: '/api/area',
           type: "POST",
           {#data: {"username":"petrov-pp", "email":"petrov-pp@example.com"},#}
           {#data: {"username":"olegov-oo", "password": "1234", "first_name": "Олег", "middle_name": "Олегович", "last_name": "Олегов", "email":"olegov-oo@example.com"},#}
           {#data: {"user_id":1, "resource_id":3},#}
-          data: {"user_id":1, "resource_id":32, "date_start": "2021-04-23", "time_start": "08:00", "date_end": "2021-04-23", "time_end": "19:00"},
+          {#data: {"user_id":1, "resource_id":32, "date_start": "2021-04-23", "time_start": "08:00", "date_end": "2021-04-23", "time_end": "19:00"},#}
           success: function(data){log(data)},
           dataType: "json"
         });
