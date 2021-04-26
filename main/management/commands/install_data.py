@@ -63,10 +63,10 @@ class Command(BaseCommand):
         ivan.set_password("1234")
         ivan.save()
         # Бронируем постоянное место
-        r = ivan.company.area_set.get(pk=1).resource_set.get(name='01')
+        r = ivan.company.area_set.first().resource_set.filter(name='07').first()
         r.seat.persisted = True
         r.seat.owner = ivan
-        r.save()
+        r.seat.save()
 
         petr = ExtUser.objects.create(username="petrov-pp", email="petrov-pp@a.com", company=cos,
             first_name="Пётр", middle_name="Петрович", last_name="Петров")
