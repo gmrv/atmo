@@ -1,4 +1,5 @@
 {% extends 'main/base.html' %}
+{% load settings_value %}
 {% load static %}
 {% load i18n %}
 {% block sub-title %}Добро пожаловать{% endblock %}
@@ -8,49 +9,121 @@
 {% block content %}
     <div class="container">
 
-
       <div class="row">
 
-        <div class="col s3">Площадка:</div>
-        <div id="id-div-area-name" class="col s9"></div>
-      </div>
+        <div class="col s6">
+          <div class="container">
 
+            {% for c in calendar %}
+              <div class="row booking-calendar">
 
-      <div class="row">
-        <div class="col s3">Ресурс: {{ resource.name }}  </div>
-        <div class="col s3">{{ resource.type }}</div>
-      </div>
+                <div class="col s2">
+                  {{ c.mil_hour }}:{{ c.minutes }}
+                </div>
 
-      <div class="row">
-        <div class="col s3">Процент брони: </div><div class="col s3">{{ resource.get_percent_of_booked_time }}</div>
-      </div>
+                {% if c.reserved  %}
+                  <div class="col s8 center name-cell" style="background-color: pink">
+              {{ c.user }}
+            </div>
+                {% else %}
+                  <div class="col s8 center name-cell" style="background-color: greenyellow">
+              &nbsp;
+            </div>
+                {% endif %}
 
-      {% for c in resource.get_calendar %}
-        <div class="row">
+              </div>
+            {% endfor %}
 
-          <div class="col s3">
-                {{ c.mil_hour }}:{{ c.minutes }}
           </div>
-
-          {% if c.reserved  %}
-            <div class="col s3" style="background-color: pink">
-              забронировано
-            </div>
-          {% else %}
-            <div class="col s3" style="background-color: greenyellow">
-              свободно
-            </div>
-          {% endif %}
-
         </div>
-      {% endfor %}
+
+        <div class="col s6">
+          <div class="container">
+
+            <div class="row">
+              <div class="col s6">Площадка:</div>
+              <div id="id-div-area-name" class="col s6"> {{ user.def_area.name }}</div>
+            </div>
+
+            <div class="row">
+              <div class="col s6">Ресурс: {{ resource.name }}  </div>
+              <div class="col s6">{{ resource.type }}</div>
+            </div>
+
+            <div class="row">
+              <div class="col s6">Процент брони: </div>
+              <div class="col s6">{{ percent_of_booked_time }}</div>
+            </div>
+
+            <div class="row">
+              <div class="col s12">&nbsp;</div>
+            </div>
+
+            <div class="row">
+              <div class="col s4"><input id="id-datepicker-start" type="text" class="datepicker"> </div>
+              <div class="col s2"></div>
+              <div class="col s4"><input id="id-timepicker-start" type="text" class="timepicker" value="{% settings_value 'OPEN_TIME' %}"></div>
+            </div>
+
+            <div class="row">
+              <div class="col s4"><input id="id-datepicker-end"  type="text" class="datepicker"></div>
+              <div class="col s2"></div>
+              <div class="col s4"><input id="id-timepicker-end"  type="text" class="timepicker" value="{% settings_value 'CLOSE_TIME' %}"></div>
+            </div>
+
+            <div class="row">
+              <div class="col s12">&nbsp;</div>
+            </div>
+
+            <div class="row">
+              <div class="col s12"><a id="id-button-booking" class="waves-effect waves-light btn progress">Забронировать</a></div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
 
     </div>
 {% endblock %}
 
 {% block extrajs %}
   <script>
+    let flag = false
     $(document).ready(function() {
+
+      $('.datepicker').datepicker({
+        format: 'yyyy-mm-dd',
+        defaultDate: new Date("{{ target_date }}",),
+        setDefaultDate: true,
+      });
+
+      $("#id-button-booking").on('click', function(e){
+        let data = {
+          "user_id": helper.user_id,
+          "resource_id":{{ resource.id }},
+          "date_start": $("#id-datepicker-start").val(),
+          "time_start": $("#id-timepicker-start").val(),
+          "date_end": $("#id-datepicker-end").val(),
+          "time_end": $("#id-timepicker-end").val()
+        }
+        request({url:'/api/booking', type:'POST', data:data, ondone:onBookingSuccess})
+      })
+
+      flag = true
     });
+
+    function onBookingSuccess(response){
+      window.location.reload()
+    }
+
+    function onChangeDatepickerTarget(e){
+      let url = "/main/booking/{{ resource.id }}/" + helper.target_date
+      if (flag){
+        window.location.href = url;
+      }
+
+    }
+
   </script>
 {% endblock %}
