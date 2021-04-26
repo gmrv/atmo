@@ -67,7 +67,7 @@ def booking(request, resource_id, target_date=None):
         calendar.append(c)
 
     context = {
-        'user': request.user.extuser,
+        'user': xuser,
         'area': xuser.def_area,
         'resource': resource,
         'calendar': calendar,

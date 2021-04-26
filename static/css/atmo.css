@@ -81,6 +81,20 @@ color: white;
     margin-top: -3px;
 }
 
+/*Booking page*/
+.booked {
+    background-color: pink;
+}
+
+.free{
+    background-color: greenyellow;
+}
+
+.persisted{
+    fill: #d1d1d1;
+}
+
+
 
 /*Map and resources*/
 

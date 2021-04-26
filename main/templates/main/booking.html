@@ -14,25 +14,29 @@
         <div class="col s6">
           <div class="container">
 
-            {% for c in calendar %}
-              <div class="row booking-calendar">
-
-                <div class="col s2">
-                  {{ c.mil_hour }}:{{ c.minutes }}
+            {% if resource.seat.persisted %}
+              {#Если это постоянное место#}
+              {% for c in calendar %}
+                <div class="row booking-calendar">
+                  <div class="col s2">{{ c.mil_hour }}:{{ c.minutes }}</div>
+                  <div class="col s8 center name-cell booked">{{ resource.seat.owner.username }}</div>
                 </div>
+              {% endfor %}
+            {% else %}
+              {#Если обычный ресурс#}
+              {% for c in calendar %}
+                <div class="row booking-calendar">
+                  <div class="col s2">{{ c.mil_hour }}:{{ c.minutes }}</div>
+                  {% if c.reserved  %}
+                    <div class="col s8 center name-cell booked">{{ c.user }}</div>
+                  {% else %}
+                    <div class="col s8 center name-cell free">nbsp;</div>
+                  {% endif %}
+                </div>
+              {% endfor %}
+             {% endif %}
 
-                {% if c.reserved  %}
-                  <div class="col s8 center name-cell" style="background-color: pink">
-              {{ c.user }}
-            </div>
-                {% else %}
-                  <div class="col s8 center name-cell" style="background-color: greenyellow">
-              &nbsp;
-            </div>
-                {% endif %}
 
-              </div>
-            {% endfor %}
 
           </div>
         </div>
@@ -59,6 +63,14 @@
               <div class="col s12">&nbsp;</div>
             </div>
 
+            {% if resource.seat.persisted %}
+
+            <div class="row">
+              <div class="col s12">Постоянное место</div>
+            </div>
+
+            {% else %}
+
             <div class="row">
               <div class="col s4"><input id="id-datepicker-start" type="text" class="datepicker"> </div>
               <div class="col s2"></div>
@@ -78,6 +90,8 @@
             <div class="row">
               <div class="col s12"><a id="id-button-booking" class="waves-effect waves-light btn progress">Забронировать</a></div>
             </div>
+
+            {% endif %}
 
           </div>
         </div>
