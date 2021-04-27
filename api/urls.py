@@ -22,6 +22,12 @@ urlpatterns = [
     path('booking/confirmation/<int:id>/<int:pin>', views.booking_confirmation, name='booking_confirmation'),
 
 
+    # Cоmpany
+    path('company', views.company, name='company'),
+    path('company/<int:company_id>', views.company, name='company'),
+    path('company/<int:company_id>/<slug:target_date>', views.company, name='company'),
+
+
     # Resource
     path('resource', views.resource, name='resource'),
     path('resource/<int:resource_id>', views.resource, name='resource'),

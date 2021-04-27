@@ -99,6 +99,22 @@ def booking_delete(request, id):
     return {"id": id}
 
 
+def company_get(request, company_id, target_date):
+    """
+
+    """
+    if company_id:
+        if Company.objects.filter(pk=company_id).count() < 1:
+            return None
+        c = Company.objects.get(pk=company_id)
+        return c.to_json(is_short=False, target_date=target_date)
+    else:
+        company_query = Company.objects.all().order_by("name")
+        result = []
+        for c in company_query:
+            result.append(c.to_json(is_short=True))
+        return result
+
 def resource_get(request, resource_id=None, area_id=None):
     """
     Получаем один или все ресурсы

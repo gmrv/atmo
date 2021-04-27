@@ -114,6 +114,26 @@ def booking_confirmation(request, id, pin):
 
 
 @login_required
+def company(request, company_id=None, target_date=None):
+    """
+    Обработка запросов связанных с объектом Компания
+    Компания это вершина иерархии объектов (Компания - Площадка(Area) - Ресурсы)
+    Пользователь имеет доступ только к тем ресурсам которые привязаны к его компании.
+    """
+    result = None
+    if request.method == "GET":
+        result = company_get(request, company_id=company_id, target_date=target_date)
+    else:
+        return JsonResponse({}, status=400, safe=False)
+
+    if not result:
+        return JsonResponse({}, status=400, safe=False)
+
+    response = get_response_template(code='ok', source=request.path, result=result)
+    return JsonResponse(response, status=200, safe=False)
+
+
+@login_required
 def resource(request, resource_id=None):
     """
     Обработка запросов связанных с объектом Ресурс (Resource)                                   \r\n

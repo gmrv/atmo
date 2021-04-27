@@ -19,12 +19,31 @@ class Common(models.Model):
 
 class Company(Common):
     """
-    Компания которой пренадлежит площадка
+    Компания это вершина иерархии объектов (Компания - Площадка(Area) - Ресурсы)
+    Пользователь имеет доступ только к тем ресурсам которые привязаны к его компании.
     """
     short_name = models.CharField(help_text='Короткое наименование',max_length=100)
     full_name = models.CharField(help_text='Полное наименование', max_length=250)
     code = models.PositiveBigIntegerField(help_text='Код ЦФО', blank=False, default=0)
     root_dir = models.CharField(help_text='Каталог со статикой', max_length=100)
+
+    def to_json(self, is_short=True, target_date=None):
+        result={
+            "id": self.id,
+            "name": self.name,
+            "short_name": self.short_name,
+            "full_name": self.full_name,
+            "code": self.code,
+            "root_dir": self.root_dir,
+            "areas": {} if is_short else self.get_areas_json(is_short=is_short, target_date=target_date)
+        }
+        return result
+
+    def get_areas_json(self, is_short=True, target_date=None):
+        result = []
+        for a in self.area_set.all():
+            result.append(a.to_json(is_short, target_date))
+        return result
 
 
 class Area(Common):
