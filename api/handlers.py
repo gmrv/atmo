@@ -66,6 +66,8 @@ def booking_post(request):
     time_start = request.POST.get("time_start", settings.OPEN_TIME)
     date_end = request.POST.get("date_end", str(timezone.now().date()))
     time_end = request.POST.get("time_end", settings.CLOSE_TIME)
+    event_text = request.POST.get("event_text", None)
+    event_part = request.POST.get("event_part", None)
 
     start = date_start + " " + time_start
     end = date_end + " " + time_end
@@ -75,12 +77,23 @@ def booking_post(request):
     if (not user_id) or (not resource_id):
         return None
 
+    e = None
+    if event_text != '':
+        e = Event.objects.create(
+            description=event_text
+        )
+        if event_part != '':
+            for u_id in event_part.split(","):
+                e.users.add(User.objects.get(pk=u_id))
+        e.save()
+
     b = Booking.objects.create(
         resource_id=resource_id,
         user_id=user_id,
         start_ts=start_ts,
         end_ts=end_ts,
-        confirmed=True
+        confirmed=True,
+        event=e,
     )
 
     return b.to_json()

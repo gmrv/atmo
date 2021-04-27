@@ -83,6 +83,18 @@ class Command(BaseCommand):
         tz = tzlocal()
         target_date = localtime(now()).date()
 
+        event1 = Event.objects.create(description="Тестовое событие 1")
+        event1.users.add(ivan, petr, sidor)
+        event1.save()
+
+        event2 = Event.objects.create(description="Тестовое событие 2")
+        event2.users.add(ivan, petr)
+        event2.save()
+
+        event3 = Event.objects.create(description="Тестовое событие 3")
+        event3.users.add(petr)
+        event3.save()
+
         Booking.objects.create(
             resource=Seat.objects.filter(name='02').first(),
             user=ivan,
@@ -111,11 +123,20 @@ class Command(BaseCommand):
             resource=Room.objects.filter(name="A1").first(),
             user=ivan,
             start_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=10, minute=0, tzinfo=tz),
-            end_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=11, minute=0, tzinfo=tz)
+            end_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=11, minute=0, tzinfo=tz),
+            event=event1
         )
         Booking.objects.create(
             resource=Room.objects.filter(name="A2").first(),
             user=ivan,
             start_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=8, minute=0, tzinfo=tz),
-            end_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=18, minute=0, tzinfo=tz)
+            end_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=9, minute=0, tzinfo=tz),
+            event=event2
+        )
+        Booking.objects.create(
+            resource=Room.objects.filter(name="A2").first(),
+            user=ivan,
+            start_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=9, minute=30, tzinfo=tz),
+            end_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=19, minute=0, tzinfo=tz),
+            event=event3
         )

@@ -102,21 +102,19 @@
             {% if resource.type == 'room' %}
               <div class="row valign-wrapper">
                 <div class="input-field col s12">
-                  <input id="id-input-event"  type="text">
+                  <input id="id-input-event-text"  type="text">
                   <label>Событие</label>
                 </div>
               </div>
 
               <div class="row valign-wrapper">
-                <div class="col s12">
-                  <div class="input-field col s12" id="id-input-partisipants">
-                    <select multiple>
-                      <option value="" disabled selected>Выберите участников</option>
-                      {% for u in users %}
-                        <option value="{{ u.id }}">{{ u.first_name }} {{ u.middle_name }} {{ u.last_name }}</option>
-                      {% endfor %}
-                    </select>
-                  </div>
+                <div class="input-field col s12" >
+                  <select multiple id="id-input-event-participants">
+                    {% for u in users %}
+                      <option value="{{ u.id }}">{{ u.first_name }} {{ u.middle_name }} {{ u.last_name }}</option>
+                    {% endfor %}
+                  </select>
+                  <label>Участники события</label>
                 </div>
               </div>
 
@@ -146,6 +144,7 @@
     $(document).ready(function() {
 
       $("#id-button-booking").on('click', function(e){
+        let dropdownParticipants = M.FormSelect.getInstance($('#id-input-event-participants'));
         let data = {
           "user_id": helper.user_id,
           "resource_id":{{ resource.id }},
@@ -153,7 +152,8 @@
           "time_start": $("#id-timepicker-start").val(),
           "date_end": $("#id-datepicker-end").val(),
           "time_end": $("#id-timepicker-end").val(),
-          "event": $("#id-input-event").val()
+          "event_text": $("#id-input-event-text").val(),
+          "event_part": dropdownParticipants.getSelectedValues().toString()
         }
         request({url:'/api/booking', type:'POST', data:data, ondone:onBookingSuccess})
       })

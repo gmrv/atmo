@@ -131,3 +131,17 @@ nav .datepicker-day-button {
 nav .is-selected .datepicker-day-button{
     color: #fff;
 }
+
+.profile-link {
+    color: #0D47A1;
+    font-weight: bold;
+}
+
+#id-row-map-container {
+  /*flex: 1 1 auto;*/
+  /*display: flex;*/
+}
+
+#id-div-map-container {
+  /*overflow-x: auto;*/
+}
