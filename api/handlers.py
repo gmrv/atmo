@@ -10,15 +10,15 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 
 
-def area_get(request, id, username, target_date):
+def area_get(request, area_id, username, target_date):
     """
     Получаем инфо площадки по ее id
     Получаем инфо о всех площадках если id не задан
     Получаем инфо о всех площадках доступных пользователю через компанию
     """
-    if id:
+    if area_id:
         # Если есть идентификатор возвращаем одну
-        a = Area.objects.get(pk=id)
+        a = Area.objects.get(pk=area_id)
         result = a.to_json(is_short=False, target_date=target_date)
 
     else:
@@ -35,13 +35,13 @@ def area_get(request, id, username, target_date):
     return result
 
 
-def booking_get(request, id, date):
+def booking_get(request, booking_id, date):
     """
     Получаем одну или все записи о бронировании
     Бронирование по пользователю доступно через эндпоинт User
     """
-    if id:
-        b = Booking.objects.get(pk=id)
+    if booking_id:
+        b = Booking.objects.get(pk=booking_id)
         result = b.to_json()
     else:
         if date:
@@ -90,13 +90,13 @@ def booking_put(request):
     pass
 
 
-def booking_delete(request, id):
+def booking_delete(request, booking_id):
     """
     Удаление брони по id
     """
-    b = Booking.objects.get(pk=id)
+    b = Booking.objects.get(pk=booking_id)
     b.delete()
-    return {"id": id}
+    return {"id": booking_id}
 
 
 def company_get(request, company_id, target_date):
@@ -143,15 +143,15 @@ def resource_get(request, resource_id=None, area_id=None):
         return result
 
 
-def user_get(request, id, username):
+def user_get(request, user_id, username):
     """
     Получаем одного или всех пользователей
     """
-    if id or username:
-        if id:
-            if ExtUser.objects.filter(pk=id).count() < 1:
+    if user_id or username:
+        if user_id:
+            if ExtUser.objects.filter(pk=user_id).count() < 1:
                 return None
-            xuser = ExtUser.objects.get(pk=id)
+            xuser = ExtUser.objects.get(pk=user_id)
         else:
             if ExtUser.objects.filter(username=username).count() < 1:
                 return None
@@ -237,7 +237,7 @@ def user_put(request):
     return xuser.to_json()
 
 
-def user_delete(request, username):
+def user_delete(request, user_id, username):
     """
     Не удаляем, помечаем как не активного
     см. описание api.views.user

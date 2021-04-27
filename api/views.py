@@ -25,7 +25,7 @@ def home(request):
 
 
 @login_required
-def area(request, id=None, username=None, target_date=None):
+def area(request, area_id=None, username=None, target_date=None):
     """
     Обработка запросов связанных с объектом Площадка (Area).                                        \r\n
     Реализовано только получение т.к. остальные действия будут выполняться только через админку.    \r\n
@@ -36,7 +36,7 @@ def area(request, id=None, username=None, target_date=None):
         /api/area/ivanon-ii - Получаем дочерние площадки компании пользователя user.company.        \r\n
     """
     if request.method == "GET":
-        result = area_get(request, id, username, target_date)
+        result = area_get(request, area_id, username, target_date)
     else:
         return JsonResponse({}, status=400, safe=False)
 
@@ -45,7 +45,7 @@ def area(request, id=None, username=None, target_date=None):
 
 
 @login_required
-def booking(request, id=None, date=None):
+def booking(request, booking_id=None, date=None):
     """
     Обработка запросов связанных с объектом Бронирование (Booking). \r\n
     **GET**\r\n
@@ -71,7 +71,7 @@ def booking(request, id=None, date=None):
         /api/booking/1 - Удалить запись с идентификатором 1. \r\n
     """
     if request.method == "GET":
-        result = booking_get(request, id, date)
+        result = booking_get(request, booking_id, date)
 
     elif request.method == "POST":
         result = booking_post(request)
@@ -82,7 +82,7 @@ def booking(request, id=None, date=None):
         pass
 
     elif request.method == "DELETE":
-        result = booking_delete(request, id)
+        result = booking_delete(request, booking_id)
 
     else:
         JsonResponse({}, status=400, safe=False)
@@ -92,7 +92,7 @@ def booking(request, id=None, date=None):
 
 
 @login_required
-def booking_confirmation(request, id, pin):
+def booking_confirmation(request, booking_id, pin):
     """
     Подтверждение брони
     PIN генерируется в момент создания брони и отправляется пользователю через email, sms или личный кабинет.
@@ -100,7 +100,7 @@ def booking_confirmation(request, id, pin):
 
     """
     result = {}
-    b = Booking.objects.get(pk=id)
+    b = Booking.objects.get(pk=booking_id)
     if b.confirmation_pin == pin:
         b.confirmed = True
         b.confirmed_by = request.user.id
@@ -159,7 +159,7 @@ def resource(request, resource_id=None):
 
 
 @login_required
-def user(request, id=None, username=None):
+def user(request, user_id=None, username=None):
     """
     Обработка запросов связанных с объектом Пользователь                                        \r\n
     **GET**                                                                                     \r\n
@@ -195,13 +195,13 @@ def user(request, id=None, username=None):
     """
     result = None
     if request.method == "GET":
-        result = user_get(request, id, username)
+        result = user_get(request, user_id, username)
     elif request.method == "POST":
         result = user_post(request)
     elif request.method == "PUT":
         result = user_put(request)
     elif request.method == "DELETE":
-        result = user_delete(request, id, username)
+        result = user_delete(request, user_id, username)
     else:
         return JsonResponse({}, status=400, safe=False)
 
