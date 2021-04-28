@@ -40,7 +40,7 @@ def area(request, area_id=None, username=None, target_date=None):
     else:
         return JsonResponse({}, status=400, safe=False)
 
-    response = get_response_template(code='ok', source=request.path, result=result)
+    response = get_response_template(code='ok', source=request.method +'::'+ request.path, result=result)
     return JsonResponse(response, status=200, safe=False)
 
 
@@ -87,7 +87,7 @@ def booking(request, booking_id=None, date=None):
     else:
         JsonResponse({}, status=400, safe=False)
 
-    response = get_response_template(code='ok', source=request.path, result=result)
+    response = get_response_template(code='ok', source=request.method +'::'+ request.path, result=result)
     return JsonResponse(response, status=200, safe=False)
 
 
@@ -109,7 +109,7 @@ def booking_confirmation(request, booking_id, pin):
         result = b.to_json()
     else:
         JsonResponse({}, status=400, safe=False)
-    response = get_response_template(code='ok', source=request.path, result=result)
+    response = get_response_template(code='ok', source=request.method +'::'+ request.path, result=result)
     return JsonResponse(response, status=200, safe=False)
 
 
@@ -120,9 +120,8 @@ def booking_can(request, resource_id, start_date=None, start_time=None, end_date
     /api/booking/can/2/2021-04-27/08:00/2021-04-27/19:00
     """
     result = Booking.can_it_booked(resource_id, start_date, start_time, end_date, end_time)
-    response = get_response_template(code='ok', source=request.path, result=result)
+    response = get_response_template(code='ok', source=request.method +'::'+ request.path, result=result)
     return JsonResponse(response, status=200, safe=False)
-
 
 
 @login_required
@@ -141,7 +140,7 @@ def company(request, company_id=None, target_date=None):
     if not result:
         return JsonResponse({}, status=400, safe=False)
 
-    response = get_response_template(code='ok', source=request.path, result=result)
+    response = get_response_template(code='ok', source=request.method +'::'+ request.path, result=result)
     return JsonResponse(response, status=200, safe=False)
 
 
@@ -153,9 +152,9 @@ def resource(request, resource_id=None):
     Все основые операции (бронирование ...) выполняются через этот класс                        \r\n
     **GET**                                                                                     \r\n
         Получение одного объекта если всех объектов                                             \r\n
-        /api/resource           - Получить всех пользователей;                                      \r\n
-        /api/resource/1         - Получить пользователя с id = 1;                                   \r\n
-        /api/resource/ivanov-ii - Получить пользователя с username = ivanov-ii;                     \r\n
+        /api/resource           - Получить всех пользователей;                                  \r\n
+        /api/resource/1         - Получить пользователя с id = 1;                               \r\n
+        /api/resource/ivanov-ii - Получить пользователя с username = ivanov-ii;                 \r\n
     """
     result = None
     if request.method == "GET":
@@ -166,7 +165,7 @@ def resource(request, resource_id=None):
     if not result:
         return JsonResponse({}, status=400, safe=False)
 
-    response = get_response_template(code='ok', source=request.path, result=result)
+    response = get_response_template(code='ok', source=request.method +'::'+ request.path, result=result)
     return JsonResponse(response, status=200, safe=False)
 
 
@@ -256,7 +255,7 @@ def user(request, user_id=None, username=None):
     if not result:
         return JsonResponse({}, status=400, safe=False)
 
-    response = get_response_template(code='ok', source=request.path, result=result)
+    response = get_response_template(code='ok', source=request.method +'::'+ request.path, result=result)
     return JsonResponse(response, status=200, safe=False)
 
 
@@ -275,7 +274,7 @@ def set_default_area(request, area_id, username=None):
     xuser.def_area_id = area_id
     xuser.save()
 
-    response = get_response_template(code='ok', source=request.path, result=None)
+    response = get_response_template(code='ok', source=request.method +'::'+ request.path, result=None)
     return JsonResponse(response, status=200, safe=False)
 
 

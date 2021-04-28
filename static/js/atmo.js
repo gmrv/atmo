@@ -1,5 +1,5 @@
 function request({url, type, data={}, ondone=function(){}, params=[]}){
-  log(`request for url: ${url}`);
+  log("request for: " + type + "::" + url);
   $.ajax({
     url: url,
     type: type,
