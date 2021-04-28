@@ -1,9 +1,10 @@
 from datetime import datetime, timedelta
 from dateutil.tz import tzlocal
 from django.conf import settings
-from django.utils.timezone import localtime, now, get_current_timezone, get_default_timezone
+from django.utils.timezone import localtime, now
 from django.db import models
 from django.contrib.auth.models import User, Group
+from api.utils import datetimestring_to_ts
 from main.utils import get_pin
 
 
@@ -368,6 +369,45 @@ class Booking(Common):
     confirmation_pin = models.PositiveSmallIntegerField(help_text= 'PIN-код', default=get_pin)
     event = models.ForeignKey(Event, help_text= 'Событие', on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
     active = models.BooleanField(blank=True, default=True)
+
+    @staticmethod
+    def can_it_booked(resource_id, start_date=None, start_time=None, end_date=None, end_time=None):
+        """
+        Проверка может ли быть забронирован указанный промежуток времени.
+        Booking.can_it_booked(
+            resource_id=2,
+            start_date="2021-04-27",
+            start_time="13:00",
+            end_date="2021-04-27",
+            end_time="14:30"
+        )
+        """
+        if not start_date: start_date = datetime.today().strftime('%Y-%m-%d')
+        if not start_time: start_time = settings.OPEN_TIME
+        if not end_date: end_date = start_date
+        if not end_time: end_time = settings.CLOSE_TIME
+
+        start_ts = datetimestring_to_ts(start_date + " " + start_time, "%Y-%m-%d %H:%M")
+        end_ts = datetimestring_to_ts(end_date + " " + end_time, "%Y-%m-%d %H:%M")
+
+        # Проверяем короткие брони
+        # Если есть хотя бы одна котороя уместится между началом и концом нашего отрезка, значит бронировать нельзя
+        bq = Booking.objects.filter(resource_id=resource_id, start_ts__gte=start_ts, end_ts__lte=end_ts)
+        #print("Short booking count:", bq.count())
+        if bq.count() > 0: return False
+
+        # Проверяем длинные брони
+        # Проверяем окажется ли начало и/или конец нашего отрезка бронирования между началом и концом длинной брони
+        tz = tzlocal()
+        bq = Booking.objects.filter(resource_id=resource_id, start_ts__gte=datetime.now(tz=tz)-timedelta(settings.BOOKING_WINDOW), end_ts__lte=datetime.now(tz=tz)+timedelta(settings.BOOKING_WINDOW))
+        for b in bq:
+            # print("Start point =", start_ts)
+            # print("End point =", end_ts)
+            # print("b.start_ts =", b.start_ts, "b.end_ts =", b.end_ts)
+            # print("Result:", (b.start_ts < start_ts < b.end_ts) or (b.start_ts < end_ts < b.end_ts))
+            if (b.start_ts < start_ts < b.end_ts) or (b.start_ts < end_ts < b.end_ts): return False
+        return True
+
 
     def to_json(self):
         result = {
