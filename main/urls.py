@@ -14,8 +14,8 @@ urlpatterns = [
     path('home/<slug:target_date>', views.home, name='home'),
 
 
-    path('booking/<int:resource_id>', views.booking, name='booking'),
-    path('booking/<int:resource_id>/<slug:target_date>', views.booking, name='booking'),
+    path('resource/<int:resource_id>', views.resource, name='resource'),
+    path('resource/<int:resource_id>/<slug:target_date>', views.resource, name='resource'),
 
     path('profile/', views.profile, name='profile'),
     path('profile/<slug:target_date>', views.profile, name='profile'),

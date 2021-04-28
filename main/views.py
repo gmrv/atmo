@@ -64,7 +64,7 @@ def profile(request, target_date=None):
 
 
 @login_required
-def booking(request, resource_id, target_date=None):
+def resource(request, resource_id, target_date=None):
     xuser = request.user.extuser
     xusers = ExtUser.objects.all().exclude(username='root')
     resource = Resource.objects.get(pk=resource_id)
@@ -83,7 +83,7 @@ def booking(request, resource_id, target_date=None):
         'target_date': target_date,
         'percent_of_booked_time': percent_of_booked_time
     }
-    return render(request, 'main/booking.html', context)
+    return render(request, 'main/resource.html', context)
 
 @login_required
 def area_select(request):

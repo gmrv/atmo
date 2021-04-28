@@ -87,7 +87,7 @@
       // Подключаем обработку клика по объектам карты
       $( "g[id^='table-']" ).on('click', function (e){
         let seatId = $(e.currentTarget).data()["id"]
-        window.location.href = '/main/booking/' + seatId + '/' + helper.target_date;
+        window.location.href = '/main/resource/' + seatId + '/' + helper.target_date;
       })
     }
 
