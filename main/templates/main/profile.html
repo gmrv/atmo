@@ -85,10 +85,34 @@
           </div>
         </div>
 
+        <div class="row">
+          <div class="col s12"><h5>Запросы:</h5></div>
+        </div>
+        <div class="row">
+          <div class="col s12">
+            <table>
+              <thead>
+                <tr>
+                    <th>Время создания</th>
+                    <th>Сообщение</th>
+                    <th>Активность</th>
+                    <th></th>
+                </tr>
+              </thead>
 
-
-
-
+              <tbody>
+                {% for s in service %}
+                <tr>
+                  <td>{{ s.created_at }}</td>
+                  <td>{{ s.message }}</td>
+                  <td>{{ s.active }}</td>
+                  <td><div id="id-delete-service-{{ s.id }}" data-id="{{ s.id }}" class="service-delete-button" href=""><i class="material-icons right">delete</i></div></td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
 
         <div class="row">
           <div class="col s1"></div>
@@ -116,7 +140,11 @@
       })
 
       $(".booking-delete-button").on('click', function(e){
-          request({url:'/api/booking/' + $(e.currentTarget).data('id'), type:'DELETE', data:{}, ondone:onBookingDeleteSuccess})
+          request({url:'/api/booking/' + $(e.currentTarget).data('id'), type:'DELETE', data:{}, ondone:onDeleteSuccess})
+      })
+
+      $(".service-delete-button").on('click', function(e){
+          request({url:'/api/service/' + $(e.currentTarget).data('id'), type:'DELETE', data:{}, ondone:onDeleteSuccess})
       })
 
       flag = true
@@ -131,7 +159,7 @@
 
     }
 
-    function onBookingDeleteSuccess(response){
+    function onDeleteSuccess(response){
       window.location.reload();
     }
 

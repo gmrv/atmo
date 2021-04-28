@@ -53,14 +53,16 @@ def profile(request, target_date=None):
 
     booking = xuser.booking_set.all()
 
+    service = ServiceRequest.objects.filter(created_by=xuser.username)
+
     context = {
         'user': xuser,
         'booking': booking,
+        'service': service,
         'resource_id': '',
         'target_date': target_date
     }
     return render(request, 'main/profile.html', context)
-
 
 
 @login_required
@@ -84,6 +86,7 @@ def resource(request, resource_id, target_date=None):
         'percent_of_booked_time': percent_of_booked_time
     }
     return render(request, 'main/resource.html', context)
+
 
 @login_required
 def area_select(request):
