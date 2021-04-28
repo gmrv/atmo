@@ -1,13 +1,7 @@
-import json
 from api.utils import *
 from main.models.core import *
 from django.db.models import Q
 from django.utils import timezone
-from django.core import serializers
-from django.urls import reverse
-from django.utils.timezone import localtime, now
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 
 
 def area_get(request, area_id, username, target_date):

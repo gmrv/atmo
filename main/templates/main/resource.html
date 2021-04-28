@@ -28,9 +28,9 @@
                 <div class="row booking-calendar">
                   <div class="col s2">{{ c.mil_hour }}:{{ c.minutes }}</div>
                   {% if c.reserved  %}
-                    <div class="col s8 center name-cell booked">{{ c.user }}</div>
+                    <div class="col s8 center name-cell booked z-depth-1">{{ c.user }}</div>
                   {% else %}
-                    <div class="col s8 center name-cell free">&nbsp;</div>
+                    <div class="col s8 center name-cell free z-depth-1">&nbsp;</div>
                   {% endif %}
                 </div>
               {% endfor %}
@@ -148,7 +148,7 @@
                       <div class="col s12">
                         <div class="input-field col s12">
                           <textarea id="id-textarea-service" class="materialize-textarea"></textarea>
-                          <label for="id-textarea-service">Опишите ваш запрос</label>
+                          <label for="id-textarea-service">Текст запроса</label>
                         </div>
                       </div>
                     </div>
