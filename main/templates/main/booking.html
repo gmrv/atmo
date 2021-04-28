@@ -77,24 +77,24 @@
 
             <div class="row valign-wrapper">
               <div class="input-field col s5">
-                <input id="id-datepicker-start" type="text" class="datepicker">
+                <input id="id-datepicker-start" type="text" class="datepicker  booking-picker">
                 <label>Дата начала</label>
               </div>
               <div class="col s1"></div>
               <div class="input-field col s5">
-                <input id="id-timepicker-start" type="text" class="timepicker" value="{% settings_value 'OPEN_TIME' %}">
+                <input id="id-timepicker-start" type="text" class="timepicker booking-picker" value="{% settings_value 'OPEN_TIME' %}">
                 <label>Время начала</label>
               </div>
             </div>
 
             <div class="row valign-wrapper">
               <div class="input-field col s5">
-                <input id="id-datepicker-end"  type="text" class="datepicker">
+                <input id="id-datepicker-end"  type="text" class="datepicker booking-picker">
                 <label>Дата окончания</label>
               </div>
               <div class="col s1"></div>
               <div class="input-field col s5">
-                <input id="id-timepicker-end"  type="text" class="timepicker" value="{% settings_value 'CLOSE_TIME' %}">
+                <input id="id-timepicker-end"  type="text" class="timepicker booking-picker" value="{% settings_value 'CLOSE_TIME' %}">
                 <label>Время окончания</label>
               </div>
             </div>
@@ -123,8 +123,9 @@
             </div>
 
 
-            <div class="row">
-              <div class="col s12">&nbsp;</div>
+            <div class="row valign-wrapper">
+              <div class="col s2"><div id="id-div-status-icon"></div></div>
+              <div class="col s10"><div id="id-div-status-text"></div></div>
             </div>
 
             <div class="row">
@@ -159,10 +160,44 @@
           "event_part": dropdownParticipants.getSelectedValues().toString()
         }
         request({url:'/api/booking', type:'POST', data:data, ondone:onBookingSuccess})
-      })
+      });
 
+      $(".booking-picker").on('change', checkBookingInterval);
+
+      checkBookingInterval();
       flag = true
     });
+
+    function checkBookingInterval(e){
+      let data = {
+        "resource_id":{{ resource.id }},
+        "date_start": $("#id-datepicker-start").val(),
+        "time_start": $("#id-timepicker-start").val(),
+        "date_end": $("#id-datepicker-end").val(),
+        "time_end": $("#id-timepicker-end").val(),
+      }
+      request({
+        url: '/api/booking/can/' +
+          data.resource_id + '/' +
+          data.date_start + '/' +
+          data.time_start + '/' +
+          data.date_end + '/' +
+          data.time_end,
+        type: 'GET',
+        ondone: function (response) {
+          let s = response.source.split('/')
+          let t = s[5] + ' ' + s[6] + ' :: ' + s[7] + ' ' + s[8]
+          if (response.result) {
+            $("#id-button-booking").removeAttr('disabled')
+            $("#id-div-status-icon").html('<i class="material-icons booking-status-ok">done</i>')
+          } else {
+            $("#id-button-booking").attr('disabled', '')
+            $("#id-div-status-icon").html('<i class="material-icons booking-status-block">block</i>')
+          }
+          $("#id-div-status-text").text(t)
+        }
+      })
+    }
 
     function onBookingSuccess(response){
       window.location.reload()

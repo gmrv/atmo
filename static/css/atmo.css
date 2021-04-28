@@ -145,3 +145,11 @@ nav .is-selected .datepicker-day-button{
 #id-div-map-container {
   /*overflow-x: auto;*/
 }
+
+.booking-status-ok {
+    color: #26a69a;
+}
+
+.booking-status-block {
+    color: #ee6e73;
+}
