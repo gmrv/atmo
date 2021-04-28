@@ -101,7 +101,7 @@ def booking_confirmation(request, booking_id, pin):
     """
     result = {}
     b = Booking.objects.get(pk=booking_id)
-    if b.confirmation_pin == pin:
+    if b.pin == pin:
         b.confirmed = True
         b.confirmed_by = request.user.id
         b.confirmed_at = localtime(now())

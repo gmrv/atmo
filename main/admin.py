@@ -6,7 +6,7 @@ from main.models.core import *
 admin.site.register(Area)
 admin.site.register(Resource)
 admin.site.register(Company)
-admin.site.register(Request)
+admin.site.register(ServiceRequest)
 admin.site.register(Notification)
 admin.site.register(ExtUser)
 admin.site.register(Event)

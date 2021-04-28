@@ -94,7 +94,6 @@ class ExtUser(User):
     """
     middle_name = models.CharField(help_text='Отчество', max_length=500)
     company = models.ForeignKey(Company, help_text='Компания', on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
-    active = models.BooleanField(blank=True, default=True)
     def_area = models.ForeignKey(Area, help_text='Площадка по умолчанию', on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
 
     def to_json(self, is_short=False):
@@ -138,7 +137,7 @@ class Notification(Common):
     start = models.DateTimeField(help_text='Начало брони', blank=True)
     finish = models.DateTimeField(help_text='Окончание брони', blank=True)
     users_group = models.ForeignKey(Group, help_text= 'Группа', on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
-    active = models.BooleanField(blank=True, default=True)
+    is_active = models.BooleanField(blank=True, default=True)
 
 
 class Resource(Common):
@@ -286,9 +285,17 @@ class Resource(Common):
 class Room(Resource):
     """
     Переговорные
-    capacity - количество сидячих мест
+    location - Адрес, описание как найти;
+    description - Общее описание комнаты;
+    capacity - количество сидячих мест;
+    has_av - Наличие аудио/видео аппаратуры
+    has_phone - Наличие телефона
     """
-    capacity = models.SmallIntegerField(help_text= 'Количество сидячих мест', default=0)
+    location = models.TextField(help_text='Описание расположения', blank=True, null=True)
+    description = models.TextField(help_text='Общее описание', blank=True, null=True)
+    capacity = models.SmallIntegerField(help_text='Количество сидячих мест', default=0)
+    has_av = models.BooleanField(help_text='Наличие аудио/видео аппаратуры', default=False)
+    has_phone = models.BooleanField(help_text='Наличие телефона', default=False)
 
     def to_json(self, is_short=False, target_date=None):
         result = {
@@ -296,7 +303,11 @@ class Room(Resource):
             "name": self.name,
             "type": self.type,
             "area": self.area_id,
+            "location": self.location,
             "capacity": self.capacity,
+            "description": self.description,
+            "has_av": self.has_av,
+            "has_phone": self.has_phone,
             "calendar": {} if is_short else self.get_calendar(target_date),
             "percent_of_booked_time": self.get_percent_of_booked_time(target_date)
         }
@@ -335,8 +346,22 @@ class Event(Common):
     description = models.CharField(help_text='Описание', max_length=500)
     users = models.ManyToManyField(User, blank=True, help_text= 'Участники', default=None)
 
+    def to_json(self):
+        result = {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "users": [],
+        }
+        users = [];
+        for u in self.users:
+            users.append(u.id)
 
-class Request(Common):
+        result.users = users
+        return result
+
+
+class ServiceRequest(Common):
     """
     Запросы пользователей к администрации коворкинга
      resource - Ресурс к которому привязан запрос. Пока предполагается что в основном это будет забронированное место.
@@ -366,7 +391,7 @@ class Booking(Common):
     confirmed = models.BooleanField(help_text='Подтверждение брони', blank=True, default=False)
     confirmed_at = models.DateTimeField(help_text='Время изменения', blank=True, null=True)
     confirmed_by = models.CharField(help_text= 'Кем подтверждено', max_length=50, blank=True, null=True, default='')
-    confirmation_pin = models.PositiveSmallIntegerField(help_text= 'PIN-код', default=get_pin)
+    pin = models.PositiveSmallIntegerField(help_text='PIN-код', default=get_pin)
     event = models.ForeignKey(Event, help_text= 'Событие', on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
     active = models.BooleanField(blank=True, default=True)
 
@@ -423,7 +448,7 @@ class Booking(Common):
             "confirmed": self.confirmed,
             "confirmed_at": self.confirmed_at,
             "confirmed_by": self.confirmed_by,
-            "confirmation_pin": self.confirmation_pin,
+            "pin": self.pin,
             "event": self.event_id,
             "active": self.active
         }

@@ -78,7 +78,7 @@ table(Room){
 ' confirmed         - подтверждение бронирования
 ' confirmed_at      - когда подтверждено
 ' confirmed_by      - кем подтверждено
-' confirmation_pin  - пин-код который надо ввести для подтверждения
+' pin  - пин-код который надо ввести для подтверждения
 table(Booking){
     primary_key(id)
     not_null(name)
@@ -91,7 +91,7 @@ table(Booking){
     confirmed
     confirmed_at
     confirmed_by
-    confirmation_pin
+    pin
     event
 }
 
@@ -109,7 +109,7 @@ table(Event){
 ' user - ползователь сгенерировавший запрос
 ' message - тело запроса
 ' active - активный или отработанный запрос
-table(Request){
+table(ServiceRequest){
     primary_key(id)
     not_null(created_at)
     not_null(created_by)
@@ -148,8 +148,8 @@ Booking -- DjangoUser
 Booking -- Resource
 Booking -- "0..1" Event
 Event -- "1..*" DjangoUser
-Request -- DjangoUser
-Request -- Resource
+ServiceRequest -- DjangoUser
+ServiceRequest -- Resource
 DjangoUser <|-- ExtUser
 
 /'
@@ -161,7 +161,7 @@ object Legend {
     Room:
     Booking: Таблица бронирования ресурсов
     Event: Событие связанное с бронированием. Например для переговорок описание собрания
-    Request: Запрос пользователя к администрации коворкингда. Например на уборку места
+    ServiceRequest: Запрос пользователя к администрации коворкингда. Например на уборку места
     UserProfile: Подробная информация о пользователе
     Notification: Широковещательное сообщения для всех пользователей или групп
 
