@@ -36,6 +36,13 @@ urlpatterns = [
     path('resource/<int:resource_id>', views.resource, name='resource'),
 
 
+    # ServiceRequest
+    path('service', views.service, name='service'),
+    path('service/<int:service_id>', views.service, name='service'),
+    path('service/byuser/<int:user_id>', views.service, name='service'),
+    path('service/byresource/<int:resource_id>', views.service, name='service'),
+
+
     # User
     path('user', views.user, name='user'),
     path('user/<int:user_id>', views.user, name='user'),

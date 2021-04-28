@@ -171,6 +171,42 @@ def resource(request, resource_id=None):
 
 
 @login_required
+def service(request, service_id=None, status=None):
+    """
+    Создание / получение / удаление запросов на обслуживание ресурса                            \r\n
+    Например на уборку переговорной или рабочего места                                          \r\n
+    **GET**                                                                                     \r\n
+        Получение одного объекта если всех объектов                                             \r\n
+        /api/service           - Получить запросы;                                              \r\n
+        /api/service/1         - Получить запрос с id = 1;                                      \r\n
+    **POST**                                                                                    \r\n
+        Создание запроса на сервисное обслуживание                                              \r\n
+        resource_id           - Получить запросы;                                               \r\n
+        message               - Получить запросы связанные с ресурсом id = 1;                   \r\n
+    **DELETE**                                                                                  \r\n
+        Удаление запроса на сервисное обслуживание                                              \r\n
+        /api/service/1         - Удалить запрос с id = 1;                                       \r\n
+
+
+    """
+    result = None
+    if request.method == "GET":
+        result = service_get(request, service_id=service_id)
+    elif request.method == "POST":
+        result = service_post(request)
+    elif request.method == "DELETE":
+        result = service_delete(request, service_id)
+    else:
+        return JsonResponse({}, status=400, safe=False)
+
+    if not result:
+        return JsonResponse({}, status=400, safe=False)
+
+    response = get_response_template(code='ok', source=request.method +'::'+ request.path, result=result)
+    return JsonResponse(response, status=200, safe=False)
+
+
+@login_required
 def user(request, user_id=None, username=None):
     """
     Обработка запросов связанных с объектом Пользователь                                        \r\n

@@ -375,6 +375,17 @@ class ServiceRequest(Common):
     message = models.CharField(help_text='Сообщение', max_length=500)
     active = models.BooleanField(blank=True, default=True)
 
+    def to_json(self, is_short=True):
+        result = {
+            "id": self.id,
+            "created_at": self.created_at,
+            "created_by": self.created_by,
+            "resource": self.resource_id,
+            "message": self.message if not is_short else {},
+            "active": self.active
+        }
+        return result
+
 
 class Booking(Common):
     """

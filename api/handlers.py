@@ -127,6 +127,7 @@ def company_get(request, company_id, target_date):
             result.append(c.to_json(is_short=True))
         return result
 
+
 def resource_get(request, resource_id=None, area_id=None):
     """
     Получаем один или все ресурсы
@@ -153,6 +154,34 @@ def resource_get(request, resource_id=None, area_id=None):
                 pass
         result = {"seats": seats_list, "rooms": rooms_list}
         return result
+
+
+def service_get(request, service_id=None):
+    if service_id:
+        return ServiceRequest.objects.get(pk=service_id).to_json(is_short=False)
+    else:
+        sq = ServiceRequest.objects.all()
+        sa = []
+        for s in sq:
+            sa.append(s.to_json(is_short=True))
+        return sa
+
+
+def service_post(request):
+    xuser = request.user.extuser
+    resource_id = request.POST.get("resource_id", None)
+    message = request.POST.get("message", None)
+    sr = ServiceRequest.objects.create(created_by=xuser.username, resource_id=resource_id, message=message)
+    return sr.to_json()
+
+
+def service_delete(request, service_id):
+    if not service_id: return None
+    r = ServiceRequest.objects.get(pk=service_id).delete()
+    if r[0] == 1:
+        return True
+    else:
+        return None
 
 
 def user_get(request, user_id, username):
