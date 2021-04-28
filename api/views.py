@@ -114,6 +114,18 @@ def booking_confirmation(request, booking_id, pin):
 
 
 @login_required
+def booking_can(request, resource_id, start_date=None, start_time=None, end_date=None, end_time=None):
+    """
+    Проверка может ли быть забронирован указанный промежуток времени.
+    /api/booking/can/2/2021-04-27/08:00/2021-04-27/19:00
+    """
+    result = Booking.can_it_booked(resource_id, start_date, start_time, end_date, end_time)
+    response = get_response_template(code='ok', source=request.path, result=result)
+    return JsonResponse(response, status=200, safe=False)
+
+
+
+@login_required
 def company(request, company_id=None, target_date=None):
     """
     Обработка запросов связанных с объектом Компания

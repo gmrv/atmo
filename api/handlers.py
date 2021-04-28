@@ -92,7 +92,6 @@ def booking_post(request):
         user_id=user_id,
         start_ts=start_ts,
         end_ts=end_ts,
-        confirmed=True,
         event=e,
     )
 
