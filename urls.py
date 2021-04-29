@@ -17,3 +17,7 @@ urlpatterns = [
     path('main/', include(('main.urls', 'main'), namespace='main')),
     path('api/', include(('api.urls', 'api'), namespace='api'))
 ]
+
+urlpatterns += [
+    path('staff/', include('staff.urls', namespace='staff')),
+]

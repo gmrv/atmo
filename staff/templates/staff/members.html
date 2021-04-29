@@ -1,0 +1,59 @@
+{% extends 'staff/base.html' %}
+{% load static %}
+{% load i18n %}
+{% block sub-title %}Пользователи{% endblock %}
+
+{% block content %}
+    <div id="new-users" class="container">
+        <h5><b>Пользователи</b></h5>
+        <br>
+
+        
+        <div class="row">
+            <a href="{% url 'staff:add_users' %}">Добавить пользователя</a>
+        </div>
+
+        <div>
+            <h6>
+                Показать новых пользователей за прошедшие: [
+                <a href="?days_back=30">30 дней</a> |
+                <a href="?days_back=90">90 дней</a> |
+                <a href="?days_back=182">182 дня</a> |
+                <a href="?days_back=365">1 год</a> |
+                <a href="?days_back=1826">5 лет</a>
+                ].
+            </h6>
+        </div>
+      
+        {% if new_users %}
+            <p>Новые пользователи за прошедшие {{ days_back }} дней</p>
+            <table class="" style='margin-bottom: 5%;'>
+            <tr>
+                <th class='left'>Имя</th>
+                <th class='center'>Компания</th>
+                <th class='center'>Логин</th>
+                <th class='center'>Email</th>
+                <th class='center'>Персонал</th>
+                <th class='center'>Крайний вход</th>
+                <th class='center'>Дата создания</th>
+                <th></th>
+            </tr>
+        
+            {% for user in new_users %}
+                <tr class='row'>
+                <td>{{ user.last_name }} {{ user.first_name }} {{ user.middle_name }}</td>
+                <td class='center'>{{ user.company.name }}</td>
+                <td class='center'>{{ user.username }}</td>
+                <td class='center'>{{ user.email }}</td>
+                <td class='center'>{{ user.is_staff|yesno:"Да,Нет" }}</td>
+                <td class='center'>{{ user.last_login|default_if_none:"-" }}</td>
+                <td class='center'>{{ user.date_joined }}</td>
+                <td></td>
+                </tr>
+            {% endfor %}
+            </table>
+        {% endif %}
+        <br>
+    </div>
+      
+{% endblock %}
