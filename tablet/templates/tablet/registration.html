@@ -1,0 +1,49 @@
+{% extends 'tablet/base.html' %}
+{% load static %}
+{% load i18n %}
+{% block sub-title %}Добро пожаловать{% endblock %}
+
+{% block style %}{% endblock %}
+
+{% block content %}
+    <div class="container">
+
+      <div class="row">
+        <div class="col s12 center"><h5>Ручная регистрация пользователей</h5></div>
+      </div>
+
+      <div class="row">
+        <table>
+          <thead>
+            <tr>
+              <th>ФИО</th>
+              <th>Почта</th>
+              <th>Количество броней</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in users %}
+            <tr>
+              <td>{{ u.first_name }} {{ u.last_name }} {{ u.middle_name }}</td>
+              <td>{{ u.email }}</td>
+              <td>{{ u.booking_set.count }}</td>
+              <td><a data-id="{{ u.id }}" class="waves-effect waves-light btn-small">Зарегистрировать</a></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+{% endblock %}
+
+{% block extrajs %}
+  <script>
+    $(document).ready(function() {
+        $('.btn-small').on('click', function(e){
+          log($(e.currentTarget).data("id"))
+        });
+    });
+  </script>
+{% endblock %}

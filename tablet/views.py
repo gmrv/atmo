@@ -74,3 +74,17 @@ def room(request, room_id=None, target_date=None):
         "room": room
     }
     return render(request, 'tablet/room.html', context)
+
+@login_required
+def registration(request):
+    xuser = request.user.extuser
+    xusers = ExtUser.objects.all().exclude(username='root')
+    rooms = Room.objects.all()
+
+    context = {
+        "user": xuser,
+        "users": xusers,
+        "rooms": rooms,
+        "room": room
+    }
+    return render(request, 'tablet/registration.html', context)

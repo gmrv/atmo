@@ -7,7 +7,11 @@ urlpatterns = [
     path('', views.index, name='index'),
 
     path('home/', views.home, name='home'),
-    path('qr/', views.qr, name='home'),
+
+    path('qr/', views.qr, name='qr'),
+
     path('room/<int:room_id>', views.room, name='room'),
     path('room/<int:room_id>/<slug:target_date>', views.room, name='room'),
+
+    path('registration/', views.registration, name='registration'),
 ]
