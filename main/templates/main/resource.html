@@ -230,10 +230,10 @@
           let t = s[5] + ' ' + s[6] + ' :: ' + s[7] + ' ' + s[8]
           if (response.result) {
             $("#id-button-booking").removeAttr('disabled')
-            $("#id-div-status-icon").html('<i class="material-icons booking-status-ok">done</i>')
+            $("#id-div-status-icon").html('<i class="material-icons color-positive">done</i>')
           } else {
             $("#id-button-booking").attr('disabled', '')
-            $("#id-div-status-icon").html('<i class="material-icons booking-status-block">block</i>')
+            $("#id-div-status-icon").html('<i class="material-icons color-negative">block</i>')
           }
           $("#id-div-status-text").text(t)
         }

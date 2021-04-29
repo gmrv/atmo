@@ -34,9 +34,9 @@
                   <td>{{ b.resource.area.name }}</td>
                   <td>{{ b.start_ts }}</td>
                   <td>{{ b.end_ts }}</td>
-                  <td>{% if b.confirmed %}<div><i class="material-icons confirmed">check_circle_outline</i></div>{% else %}<div><i class="material-icons notconfirmed">help_outline</i></div>{% endif %}</td>
+                  <td>{% if b.confirmed %}<div><i class="material-icons color-positive">check_circle_outline</i></div>{% else %}<div><i class="material-icons color-negative">help_outline</i></div>{% endif %}</td>
                   <td>{{ b.event.description }}</td>
-                  <td><div class="profile-link tooltipped" data-position="top" data-tooltip="{% for u in  b.event.users.all%}{{ u.username }}; {% endfor %}">{{ b.event.users.count }}</div></td>
+                  <td><div class="profile-participant-link tooltipped" data-position="top" data-tooltip="{% for u in  b.event.users.all%}{{ u.username }}; {% endfor %}">{{ b.event.users.count }}</div></td>
                   <td><a data-id="{{ b.id }}" class="waves-effect waves-light btn-small" {% if b.confirmed %}disabled{% else %}&nbsp;{% endif %}>Подтвердить</a></td>
                 </tr>
                 {% endfor %}
@@ -53,7 +53,7 @@
 
     </div>
     <!-- Modal Structure -->
-<div id="modal1" class="modal">
+<div id="modal1" class="modal pin">
   <a href="#!" class="modal-close waves-effect waves-green btn-flat right"><i class="material-icons">close</i></a>
   <div class="modal-content">
     <div id="id-modal-body">
@@ -83,44 +83,38 @@
 
 {% block extrajs %}
   <script>
-  modalInfo=null;
-  $(document).ready(function() {
+    modalInfo=null;
+    $(document).ready(function() {
 
-      $('.modal').modal({
-        dismissible: true, // Modal can be dismissed by clicking outside of the modal
-        onCloseEnd: function(){window.location.reload()}
-      });
+        $('.modal').modal({
+          dismissible: true, // Modal can be dismissed by clicking outside of the modal
+          onCloseEnd: function(){window.location.reload()}
+        });
 
-      modalInfo = M.Modal.getInstance($('#modal1'));
+        modalInfo = M.Modal.getInstance($('#modal1'));
 
-      $('.btn-small').on('click', function(e){
-        $("#id-input-booking").val($(e.currentTarget).data("id"));
-        modalInfo.open()
-      });
+        $('.btn-small').on('click', function(e){
+          $("#id-input-booking").val($(e.currentTarget).data("id"));
+          modalInfo.open()
+        });
 
-      $('#id-button-confirm').on('click', function(e){
-        let pin = $("#id-pin").val() || "0000";
+        $('#id-button-confirm').on('click', function(e){
+          let pin = $("#id-pin").val() || "0000";
 
-        request({
-          url:'/api/booking/confirmation/' + $("#id-input-booking").val() + '/' + pin,
-          type: 'GET',
-          ondone: function(response){
-            if(response.result){
-              modalInfo.close()
-            }else{
-              M.toast({html:"Неверный PIN!"})
+          request({
+            url:'/api/booking/confirmation/' + $("#id-input-booking").val() + '/' + pin,
+            type: 'GET',
+            ondone: function(response){
+              if(response.result){
+                modalInfo.close()
+              }else{
+                M.toast({html:"Неверный PIN!"})
+              }
+
+
             }
-
-
-          }
-        })
-      });
-
-
-      //modalInfo.open()
-  });
-
-
-
+          })
+        });
+    });
   </script>
 {% endblock %}

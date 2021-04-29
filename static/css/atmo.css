@@ -40,21 +40,6 @@ a:hover {
   cursor: pointer;
 }
 
-/*Materialize*/
-
-
-.row .col {
-    padding: 0 0;
-}
-
-.input-field.col label {
-    left: 0;
-}
-
-nav {
-    margin-bottom: 1vh;
-}
-
 .booked {
     cursor: pointer;
 }
@@ -68,9 +53,11 @@ nav {
 }
 
 #id-datepicker-target {
-color: white;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
     padding-left: 5px;
-    border: solid 1px;
+    border: solid 0px;
     width: 88px;
 }
 
@@ -81,8 +68,6 @@ color: white;
     margin-top: -3px;
 }
 
-/*Booking page*/
-/**/
 .booked {
     background-color: pink;
 }
@@ -95,7 +80,6 @@ color: white;
     fill: #d1d1d1;
 }
 
-/*Map and resources*/
 .resource {
     cursor: pointer;
 }
@@ -104,61 +88,29 @@ color: white;
     fill: pink;
 }
 
-.resource .free{
-    fill: #003274;
+.resource .persisted{
+    fill: #d1d1d1;
 }
 
 .resource rect .free{
     fill: white;
 }
 
-.resource .persisted{
-    fill: #d1d1d1;
-}
-
 .atmo-link {
     cursor: pointer;
 }
 
-.row.valign-wrapper .col{
-    margin-left: 0px;
-}
-
-nav .datepicker-day-button {
-    color: rgba(0, 0, 0, 0.87);
-}
-
-nav .is-selected .datepicker-day-button{
-    color: #fff;
-}
-
-.profile-link {
+.profile-participant-link {
     color: #0D47A1;
     font-weight: bold;
 }
 
-#id-row-map-container {
-  /*flex: 1 1 auto;*/
-  /*display: flex;*/
-}
-
-#id-div-map-container {
-  /*overflow-x: auto;*/
-}
-
-.booking-status-ok {
+.color-positive {
     color: #26a69a;
 }
 
-.booking-status-block {
+.color-negative {
     color: #ee6e73;
-}
-
-.collapsible {
-     border-top: 0px solid #ddd;
-     border-right: 0px solid #ddd;
-     border-left: 0px solid #ddd;
-     margin: 0.5rem 0 1rem 0;
 }
 
 nav .nav-wrapper .tablet-icon {
@@ -177,14 +129,56 @@ h4 {
    color: #ee6e73;
 }
 
-.notconfirmed {
-    color: #ee6e73;
+.top-nav-user{
+    margin-right: 40px;
 }
 
-.confirmed {
-    color: #26a69a;
-}
-
-.modal {
+.modal .pin{
     width: 30%;
+}
+
+
+
+/* materialize.css patch */
+.row .col {
+    padding: 0 0;
+}
+
+.input-field.col label {
+    left: 0;
+}
+
+nav {
+    margin-bottom: 1vh;
+}
+
+.collapsible {
+     border-top: 0px solid #ddd;
+     border-right: 0px solid #ddd;
+     border-left: 0px solid #ddd;
+     margin: 0.5rem 0 1rem 0;
+}
+
+.row.valign-wrapper .col{
+    margin-left: 0px;
+}
+
+nav .datepicker-day-button {
+    color: rgba(0, 0, 0, 0.87);
+}
+
+nav .is-selected .datepicker-day-button{
+    color: #fff;
+}
+
+input[type=text]:not(.browser-default):focus:not([readonly]) {
+  /* Предотвращение появления нижней границы при активации. */
+  /* materialize.css:6215 */
+  border-bottom: 0px solid #26a69a;
+  -webkit-box-shadow: 0 0px 0 0 #26a69a;
+          box-shadow: 0 0px 0 0 #26a69a;
+}
+
+.confirmation-btns {
+    display: contents;
 }

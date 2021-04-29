@@ -76,11 +76,11 @@
                   <td>{% if b.resource.type == 'room' %} {{ b.pin}} {% endif %}</td>
                   <td>
                     {% if b.resource.type == 'room' %}
-                    {% if b.confirmed %}<div><i class="material-icons confirmed">check_circle_outline</i></div>{% else %}<div><i class="material-icons notconfirmed">help_outline</i></div>{% endif %}
+                    {% if b.confirmed %}<div><i class="material-icons color-positive">check_circle_outline</i></div>{% else %}<div><i class="material-icons color-negative">help_outline</i></div>{% endif %}
                     {% endif %}
                   </td>
                   <td>{{ b.event.description }}</td>
-                  <td><div class="profile-link tooltipped" data-position="top" data-tooltip="{% for u in  b.event.users.all%}{{ u.username }}; {% endfor %}">{{ b.event.users.count }}</div></td>
+                  <td><div class="profile-participant-link tooltipped" data-position="top" data-tooltip="{% for u in  b.event.users.all%}{{ u.username }}; {% endfor %}">{{ b.event.users.count }}</div></td>
                   <td><div id="id-delete-{{ b.id }}" data-id="{{ b.id }}" class="booking-delete-button" href=""><i class="material-icons right trash">delete</i></div></td>
 
                 </tr>
