@@ -1,0 +1,43 @@
+{% extends 'tablet/base.html' %}
+{% load static %}
+{% load i18n %}
+{% block sub-title %}Добро пожаловать{% endblock %}
+
+{% block style %}{% endblock %}
+
+{% block content %}
+    <div class="container">
+
+      <div class="row">
+        <div class="col s12 center"><h5>Быстрая регистрация по QR-коду</h5></div>
+      </div>
+
+      <div class="row">
+        <div class="col s12 center" id="some-target">
+          <img id="id-qr" src="" class="z-depth-1"></img>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col s4 center"></div>
+        <div class="col s4 center"><a id="id-button-booking" class="waves-effect waves-light btn progress">Регистрация</a></div>
+        <div class="col s4 center"></div>
+      </div>
+
+    </div>
+{% endblock %}
+
+{% block extrajs %}
+  <script>
+  $(document).ready(function() {
+
+    $("#id-qr").attr("src", '/tablet/qr/?nocash='+ Math.floor(Math.random() * 999999999));
+    setInterval(function(){
+      $("#id-qr").attr("src", '/tablet/qr/?nocash='+ Math.floor(Math.random() * 999999999));
+    }, 3000)
+  });
+
+
+
+  </script>
+{% endblock %}
