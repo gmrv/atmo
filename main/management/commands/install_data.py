@@ -95,6 +95,14 @@ class Command(BaseCommand):
         event3.users.add(petr)
         event3.save()
 
+        event4 = Event.objects.create(description="Планерка")
+        event4.users.add(ivan, petr, sidor)
+        event4.save()
+
+        event5 = Event.objects.create(description="Совещание")
+        event5.users.add(ivan, petr, sidor)
+        event5.save()
+
         Booking.objects.create(
             resource=Seat.objects.filter(name='02').first(),
             user=ivan,
@@ -125,6 +133,20 @@ class Command(BaseCommand):
             start_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=10, minute=0, tzinfo=tz),
             end_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=11, minute=0, tzinfo=tz),
             event=event1
+        )
+        Booking.objects.create(
+            resource=Room.objects.filter(name="A1").first(),
+            user=ivan,
+            start_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=13, minute=0, tzinfo=tz),
+            end_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=13, minute=30, tzinfo=tz),
+            event=event4
+        )
+        Booking.objects.create(
+            resource=Room.objects.filter(name="A1").first(),
+            user=ivan,
+            start_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=16, minute=0, tzinfo=tz),
+            end_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=17, minute=0, tzinfo=tz),
+            event=event5
         )
         Booking.objects.create(
             resource=Room.objects.filter(name="A2").first(),

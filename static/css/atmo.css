@@ -74,7 +74,7 @@ color: white;
     width: 88px;
 }
 
-#id-container-profile .material-icons{
+.trash{
     color: #ee6e73;
     font-size: 20px;
     cursor: pointer;
@@ -175,4 +175,16 @@ button {
 
 h4 {
    color: #ee6e73;
+}
+
+.notconfirmed {
+    color: #ee6e73;
+}
+
+.confirmed {
+    color: #26a69a;
+}
+
+.modal {
+    width: 30%;
 }

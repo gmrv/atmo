@@ -104,14 +104,14 @@ def booking_confirmation(request, booking_id, pin):
     """
     result = {}
     b = Booking.objects.get(pk=booking_id)
-    if b.pin == pin:
+    if str(b.pin) == pin:
         b.confirmed = True
         b.confirmed_by = request.user.id
         b.confirmed_at = localtime(now())
         b.save()
-        result = b.to_json()
+        result = True
     else:
-        JsonResponse({}, status=400, safe=False)
+        result = False
     response = get_response_template(code='ok', source=request.method +'::'+ request.path, result=result)
     return JsonResponse(response, status=200, safe=False)
 

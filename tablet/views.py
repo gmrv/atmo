@@ -60,3 +60,17 @@ def qr(request, area_id=None, target_date=None):
     img.save(response, "PNG")
     print('request')
     return response
+
+
+@login_required
+def room(request, room_id=None, target_date=None):
+    xuser = request.user.extuser
+    room = Room.objects.get(pk=room_id)
+    rooms = Room.objects.all()
+
+    context = {
+        "user": xuser,
+        "rooms": rooms,
+        "room": room
+    }
+    return render(request, 'tablet/room.html', context)

@@ -58,6 +58,7 @@
                     <th>Начало</th>
                     <th>Окончание</th>
                     <th>PIN</th>
+                    <th>Статус</th>
                     <th>Описание</th>
                     <th><i class="material-icons">group</i></th>
                     <th></th>
@@ -71,10 +72,16 @@
                   <td>{{ b.resource.area.name }}</td>
                   <td>{{ b.start_ts }}</td>
                   <td>{{ b.end_ts }}</td>
-                  <td>{{ b.confirmation_pin}}</td>
+
+                  <td>{% if b.resource.type == 'room' %} {{ b.pin}} {% endif %}</td>
+                  <td>
+                    {% if b.resource.type == 'room' %}
+                    {% if b.confirmed %}<div><i class="material-icons confirmed">check_circle_outline</i></div>{% else %}<div><i class="material-icons notconfirmed">help_outline</i></div>{% endif %}
+                    {% endif %}
+                  </td>
                   <td>{{ b.event.description }}</td>
                   <td><div class="profile-link tooltipped" data-position="top" data-tooltip="{% for u in  b.event.users.all%}{{ u.username }}; {% endfor %}">{{ b.event.users.count }}</div></td>
-                  <td><div id="id-delete-{{ b.id }}" data-id="{{ b.id }}" class="booking-delete-button" href=""><i class="material-icons right">delete</i></div></td>
+                  <td><div id="id-delete-{{ b.id }}" data-id="{{ b.id }}" class="booking-delete-button" href=""><i class="material-icons right trash">delete</i></div></td>
 
                 </tr>
                 {% endfor %}
@@ -106,7 +113,7 @@
                   <td>{{ s.created_at }}</td>
                   <td>{{ s.message }}</td>
                   <td>{{ s.active }}</td>
-                  <td><div id="id-delete-service-{{ s.id }}" data-id="{{ s.id }}" class="service-delete-button" href=""><i class="material-icons right">delete</i></div></td>
+                  <td><div id="id-delete-service-{{ s.id }}" data-id="{{ s.id }}" class="service-delete-button" href=""><i class="material-icons right trash">delete</i></div></td>
                 </tr>
                 {% endfor %}
               </tbody>

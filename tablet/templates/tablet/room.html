@@ -1,0 +1,126 @@
+{% extends 'tablet/base.html' %}
+{% load static %}
+{% load i18n %}
+{% block sub-title %}Добро пожаловать{% endblock %}
+
+{% block style %}{% endblock %}
+
+{% block content %}
+    <div class="container">
+
+      <div class="row">
+        <div class="col s12 center"><h5>Переговорная {{ room.name }}</h5></div>
+      </div>
+
+      <div class="row">
+            <table>
+              <thead>
+                <tr>
+                    <th>Ресурс</th>
+                    <th>Площадка</th>
+                    <th>Начало</th>
+                    <th>Окончание</th>
+                    <th>Статус</th>
+                    <th>Описание</th>
+                    <th><i class="material-icons">group</i></th>
+                    <th></th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {% for b in room.booking_set.all %}
+                <tr>
+                  <td>{{ b.resource.name }}</td>
+                  <td>{{ b.resource.area.name }}</td>
+                  <td>{{ b.start_ts }}</td>
+                  <td>{{ b.end_ts }}</td>
+                  <td>{% if b.confirmed %}<div><i class="material-icons confirmed">check_circle_outline</i></div>{% else %}<div><i class="material-icons notconfirmed">help_outline</i></div>{% endif %}</td>
+                  <td>{{ b.event.description }}</td>
+                  <td><div class="profile-link tooltipped" data-position="top" data-tooltip="{% for u in  b.event.users.all%}{{ u.username }}; {% endfor %}">{{ b.event.users.count }}</div></td>
+                  <td><a data-id="{{ b.id }}" class="waves-effect waves-light btn-small" {% if b.confirmed %}disabled{% else %}&nbsp;{% endif %}>Подтвердить</a></td>
+                </tr>
+                {% endfor %}
+
+              </tbody>
+            </table>
+      </div>
+
+      <div class="row">
+        <div class="col s4 center"></div>
+        <div class="col s4 center"></div>
+        <div class="col s4 center"></div>
+      </div>
+
+    </div>
+    <!-- Modal Structure -->
+<div id="modal1" class="modal">
+  <a href="#!" class="modal-close waves-effect waves-green btn-flat right"><i class="material-icons">close</i></a>
+  <div class="modal-content">
+    <div id="id-modal-body">
+        <div container>
+          <div class="row">
+            <div class="col s12 center"><h5>Подтверждение брони</h5></div>
+          </div>
+          <div class="row">
+            <div class="input-field col s12 center">
+              <input id="id-pin" type="password" class="validate center">
+              <label for="id-pin">PIN</label>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col s12 center">
+              <input id="id-input-booking" type="hidden"/>
+              <a id="id-button-confirm" class="waves-effect waves-light btn">Подтвердить</a>
+            </div>
+          </div>
+        </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}
+
+{% block extrajs %}
+  <script>
+  modalInfo=null;
+  $(document).ready(function() {
+
+      $('.modal').modal({
+        dismissible: true, // Modal can be dismissed by clicking outside of the modal
+        onCloseEnd: function(){window.location.reload()}
+      });
+
+      modalInfo = M.Modal.getInstance($('#modal1'));
+
+      $('.btn-small').on('click', function(e){
+        $("#id-input-booking").val($(e.currentTarget).data("id"));
+        modalInfo.open()
+      });
+
+      $('#id-button-confirm').on('click', function(e){
+        let pin = $("#id-pin").val() || "0000";
+
+        request({
+          url:'/api/booking/confirmation/' + $("#id-input-booking").val() + '/' + pin,
+          type: 'GET',
+          ondone: function(response){
+            if(response.result){
+              modalInfo.close()
+            }else{
+              M.toast({html:"Неверный PIN!"})
+            }
+
+
+          }
+        })
+      });
+
+
+      //modalInfo.open()
+  });
+
+
+
+  </script>
+{% endblock %}
