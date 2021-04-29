@@ -160,3 +160,19 @@ nav .is-selected .datepicker-day-button{
      border-left: 0px solid #ddd;
      margin: 0.5rem 0 1rem 0;
 }
+
+nav .nav-wrapper .tablet-icon {
+    font-size: 17px;
+}
+
+button {
+    width: 100%;
+}
+
+#id_username, #id_password {
+    text-align: center;
+}
+
+h4 {
+   color: #ee6e73;
+}
