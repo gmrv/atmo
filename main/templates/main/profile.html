@@ -76,7 +76,7 @@
                   <td>{% if b.resource.type == 'room' %} {{ b.pin}} {% endif %}</td>
                   <td>
                     {% if b.resource.type == 'room' %}
-                    {% if b.confirmed %}<div><i class="material-icons color-positive">check_circle_outline</i></div>{% else %}<div><i class="material-icons color-negative">help_outline</i></div>{% endif %}
+                    {% if b.is_confirmed %}<div><i class="material-icons color-positive">check_circle_outline</i></div>{% else %}<div><i class="material-icons color-negative">help_outline</i></div>{% endif %}
                     {% endif %}
                   </td>
                   <td>{{ b.event.description }}</td>
@@ -108,12 +108,12 @@
               </thead>
 
               <tbody>
-                {% for s in service %}
+                {% for t in tasks %}
                 <tr>
-                  <td>{{ s.created_at }}</td>
-                  <td>{{ s.message }}</td>
-                  <td>{{ s.active }}</td>
-                  <td><div id="id-delete-service-{{ s.id }}" data-id="{{ s.id }}" class="service-delete-button" href=""><i class="material-icons right trash">delete</i></div></td>
+                  <td>{{ t.created_at }}</td>
+                  <td>{{ t.message }}</td>
+                  <td>{{ t.is_active }}</td>
+                  <td><div id="id-delete-task-{{ t.id }}" data-id="{{ t.id }}" class="task-delete-button" href=""><i class="material-icons right trash">delete</i></div></td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -150,8 +150,8 @@
           request({url:'/api/booking/' + $(e.currentTarget).data('id'), type:'DELETE', data:{}, ondone:onDeleteSuccess})
       })
 
-      $(".service-delete-button").on('click', function(e){
-          request({url:'/api/service/' + $(e.currentTarget).data('id'), type:'DELETE', data:{}, ondone:onDeleteSuccess})
+      $(".task-delete-button").on('click', function(e){
+          request({url:'/api/task/' + $(e.currentTarget).data('id'), type:'DELETE', data:{}, ondone:onDeleteSuccess})
       })
 
       flag = true

@@ -53,12 +53,12 @@ def profile(request, target_date=None):
 
     booking = xuser.booking_set.all()
 
-    service = ServiceRequest.objects.filter(created_by=xuser.username)
+    tasks = Task.objects.filter(created_by=xuser.username)
 
     context = {
         'user': xuser,
         'booking': booking,
-        'service': service,
+        'tasks': tasks,
         'resource_id': '',
         'target_date': target_date
     }

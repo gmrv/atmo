@@ -125,7 +125,7 @@
           $(rectName).removeClass("booked", "persisted")
         }
 
-        if(resourceDict[key]['persisted']) {
+        if(resourceDict[key]['status']=='persisted') {
           $(circleName).addClass("persisted")
           $(rectName).addClass("persisted")
         }

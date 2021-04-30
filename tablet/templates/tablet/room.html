@@ -34,10 +34,10 @@
                   <td>{{ b.resource.area.name }}</td>
                   <td>{{ b.start_ts }}</td>
                   <td>{{ b.end_ts }}</td>
-                  <td>{% if b.confirmed %}<div><i class="material-icons color-positive">check_circle_outline</i></div>{% else %}<div><i class="material-icons color-negative">help_outline</i></div>{% endif %}</td>
+                  <td>{% if b.is_confirmed %}<div><i class="material-icons color-positive">check_circle_outline</i></div>{% else %}<div><i class="material-icons color-negative">help_outline</i></div>{% endif %}</td>
                   <td>{{ b.event.description }}</td>
                   <td><div class="profile-participant-link tooltipped" data-position="top" data-tooltip="{% for u in  b.event.users.all%}{{ u.username }}; {% endfor %}">{{ b.event.users.count }}</div></td>
-                  <td><a data-id="{{ b.id }}" class="waves-effect waves-light btn-small" {% if b.confirmed %}disabled{% else %}&nbsp;{% endif %}>Подтвердить</a></td>
+                  <td><a data-id="{{ b.id }}" class="waves-effect waves-light btn-small" {% if b.is_confirmed %}disabled{% else %}&nbsp;{% endif %}>Подтвердить</a></td>
                 </tr>
                 {% endfor %}
 

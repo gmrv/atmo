@@ -63,7 +63,7 @@
               <div class="col s12">&nbsp;</div>
             </div>
 
-            {% if resource.seat.persisted %}
+            {% if resource.seat.status == 'persisted' %}
 
             <div class="row valign-wrapper">
               <div class="col s12">Постоянное место</div>
@@ -147,13 +147,13 @@
                     <div class="row">
                       <div class="col s12">
                         <div class="input-field col s12">
-                          <textarea id="id-textarea-service" class="materialize-textarea"></textarea>
-                          <label for="id-textarea-service">Текст запроса</label>
+                          <textarea id="id-textarea-task" class="materialize-textarea"></textarea>
+                          <label for="id-textarea-task">Текст запроса</label>
                         </div>
                       </div>
                     </div>
                     <div class="row">
-                      <div class="col s12"><a id="id-button-service" class="waves-effect waves-light btn progress">Отпавить</a></div>
+                      <div class="col s12"><a id="id-button-task" class="waves-effect waves-light btn progress">Отпавить</a></div>
                     </div>
                   </div>
                 </div>
@@ -190,14 +190,14 @@
         request({url:'/api/booking', type:'POST', data:data, ondone:onBookingSuccess})
       });
 
-      $("#id-button-service").on('click', function(e){
+      $("#id-button-task").on('click', function(e){
         let data = {
           "user_id": helper.user_id,
           "resource_id":{{ resource.id }},
-          "message": $("#id-textarea-service").val(),
+          "message": $("#id-textarea-task").val(),
         }
         request({
-          url:'/api/service', type:'POST', data:data, ondone:function(response){
+          url:'/api/task', type:'POST', data:data, ondone:function(response){
             M.toast({html: "Запрос отправлен успешно."})
           }
         });
