@@ -8,14 +8,30 @@ from api.utils import datetimestring_to_ts
 from main.utils import get_pin
 
 
+class CommonManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_deleted=False)
+
+
 class Common(models.Model):
     name = models.CharField(help_text='Наименование', max_length=250)
+    is_deleted =  models.BooleanField(default=False, blank=False, null=False)
+    objects = CommonManager()
+    native_objects = models.Manager()
+
+    def delete(self, *args, **kwargs):
+        self.is_deleted = True
+        self.save()
+
+    def native_delete(self, *args, **kwargs):
+        super().delete()
 
     def __str__(self):
         return ("Id: %s; Name: %s;"  % (self.id, self.name))
 
     class Meta:
         abstract = True
+        base_manager_name = 'objects' # Заменяем менеджер для обратных связей (p.versions etc.)
 
 
 class Company(Common):
@@ -166,6 +182,8 @@ class Resource(Common):
         """
         Календарь ресурса на день
         Возвращает словарь временных отрезков с разбивкой по полчаса с открытия по закрытие
+        Код взят из проекта Nadine Project и немного модифицирован
+        https://github.com/nadineproject/nadine/blob/dd17c345d5f3773c1bfb4814fddbd9e9163d9b0a/nadine/models/resource.py#L97
         """
         calendar = []
 
@@ -208,6 +226,8 @@ class Resource(Common):
         target_date - Дата за которую нужно получить календарь брони
         Возвращает словарь временных отрезков с разбивкой по полчаса с открытия по закрытие
         Помеченных в зависимости от их статуса занятости.
+        Код взят из проекта Nadine Project и немного модифицирован
+        https://github.com/nadineproject/nadine/blob/dd17c345d5f3773c1bfb4814fddbd9e9163d9b0a/nadine/models/resource.py#L138
         """
         if not target_date:
             target_date = localtime(now()).date()
@@ -320,7 +340,15 @@ class Seat(Resource):
     persisted - True если закреплено за конкретным сотрудником
     owner - Сотрудник за которым закреплено место
     """
-    persisted = models.BooleanField(help_text= 'Постоянное место', blank=True, default=False)
+    STATUS_AVAILABLE = 'available'
+    STATUS_UNAVAILABLE = 'unavailable'
+    STATUS_PERSISTED = 'persisted'
+    AREA_TYPE = (
+        (STATUS_AVAILABLE, 'Доступно'),
+        (STATUS_UNAVAILABLE, 'Недоступно'),
+        (STATUS_UNAVAILABLE, 'Недоступно'),
+    )
+    status = models.CharField(help_text='Статус места', max_length=11, choices=AREA_TYPE, default=STATUS_AVAILABLE)
     owner = models.ForeignKey(User, help_text= 'За кем закреплено', on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
 
     def to_json(self, is_short=False, target_date=None):
@@ -329,7 +357,7 @@ class Seat(Resource):
             "name": self.name,
             "type": self.type,
             "area": self.area_id,
-            "persisted": self.persisted,
+            "status": self.status,
             "owner": self.owner_id,
             "calendar": {} if is_short else self.get_calendar(target_date),
             "percent_of_booked_time": self.get_percent_of_booked_time(target_date)
@@ -361,19 +389,26 @@ class Event(Common):
         return result
 
 
-class ServiceRequest(Common):
+class Task(Common):
     """
-    Запросы пользователей к администрации коворкинга
-     resource - Ресурс к которому привязан запрос. Пока предполагается что в основном это будет забронированное место.
-     created_by - ползователь сгенерировавший запрос
-     message - тело запроса
-     active - активный или отработанный запрос
+    Задачи для сотрудников коворкинга
+     resource - ресурс к которому привязана задача.
+     created_by - пользователь сгенерировавший запрос
+     message - описание задачи
+     is_active - активный или отработанный запрос
     """
+    TASK_TYPE_USER = 'user'
+    TASK_TYPE_SHEDULE = 'shed'
+    TYPE_CHOICES = [
+        (TASK_TYPE_USER, 'Запрос пользователя'),
+        (TASK_TYPE_SHEDULE, 'Плановая задача'),
+    ]
     created_at = models.DateTimeField(help_text='Время создания', auto_now_add=True)
     created_by = models.CharField(help_text= 'Кем создано', max_length=50, null=False, default='')
     resource = models.ForeignKey(Resource, help_text='Объект запроса', on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
+    type = models.CharField(help_text='Тип задачи', max_length=4, choices=TYPE_CHOICES, default=TASK_TYPE_USER)
     message = models.CharField(help_text='Сообщение', max_length=500)
-    active = models.BooleanField(blank=True, default=True)
+    is_active = models.BooleanField(blank=True, default=True)
 
     def to_json(self, is_short=True):
         result = {
@@ -382,7 +417,7 @@ class ServiceRequest(Common):
             "created_by": self.created_by,
             "resource": self.resource_id,
             "message": self.message if not is_short else {},
-            "active": self.active
+            "is_active": self.is_active
         }
         return result
 
@@ -399,12 +434,12 @@ class Booking(Common):
     user = models.ForeignKey(User, help_text= 'Бронирующий', on_delete=models.deletion.CASCADE, blank=False, null=True, default=None)
     start_ts = models.DateTimeField(help_text='Начало брони', blank=False)
     end_ts = models.DateTimeField(help_text='Окончание брони', blank=False)
-    confirmed = models.BooleanField(help_text='Подтверждение брони', blank=True, default=False)
+    is_confirmed = models.BooleanField(help_text='Подтверждение брони', blank=True, default=False)
     confirmed_at = models.DateTimeField(help_text='Время изменения', blank=True, null=True)
     confirmed_by = models.CharField(help_text= 'Кем подтверждено', max_length=50, blank=True, null=True, default='')
     pin = models.PositiveSmallIntegerField(help_text='PIN-код', default=get_pin)
     event = models.ForeignKey(Event, help_text= 'Событие', on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
-    active = models.BooleanField(blank=True, default=True)
+    is_active = models.BooleanField(blank=True, default=True)
 
     @staticmethod
     def can_it_booked(resource_id, start_date=None, start_time=None, end_date=None, end_time=None):
@@ -444,7 +479,6 @@ class Booking(Common):
             if (b.start_ts < start_ts < b.end_ts) or (b.start_ts < end_ts < b.end_ts): return False
         return True
 
-
     def to_json(self):
         result = {
             "id": self.id,
@@ -456,11 +490,11 @@ class Booking(Common):
             "user": self.user_id,
             "start_ts": self.start_ts,
             "end_ts": self.end_ts,
-            "confirmed": self.confirmed,
+            "confirmed": self.is_confirmed,
             "confirmed_at": self.confirmed_at,
             "confirmed_by": self.confirmed_by,
             "pin": self.pin,
             "event": self.event_id,
-            "active": self.active
+            "active": self.is_active
         }
         return result

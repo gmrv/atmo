@@ -64,7 +64,7 @@ class Command(BaseCommand):
         ivan.save()
         # Бронируем постоянное место
         r = ivan.company.area_set.first().resource_set.filter(name='07').first()
-        r.seat.persisted = True
+        r.seat.status = Seat.STATUS_PERSISTED
         r.seat.owner = ivan
         r.seat.save()
 

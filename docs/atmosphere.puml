@@ -109,7 +109,7 @@ table(Event){
 ' user - ползователь сгенерировавший запрос
 ' message - тело запроса
 ' active - активный или отработанный запрос
-table(ServiceRequest){
+table(Task){
     primary_key(id)
     not_null(created_at)
     not_null(created_by)
@@ -148,8 +148,8 @@ Booking -- DjangoUser
 Booking -- Resource
 Booking -- "0..1" Event
 Event -- "1..*" DjangoUser
-ServiceRequest -- DjangoUser
-ServiceRequest -- Resource
+Task -- DjangoUser
+Task -- Resource
 DjangoUser <|-- ExtUser
 
 /'
@@ -161,10 +161,9 @@ object Legend {
     Room:
     Booking: Таблица бронирования ресурсов
     Event: Событие связанное с бронированием. Например для переговорок описание собрания
-    ServiceRequest: Запрос пользователя к администрации коворкингда. Например на уборку места
-    UserProfile: Подробная информация о пользователе
+    Task: Задачи для персонала коворкинга (протереть стол, убрать переговорную и т.п.)
+    ExtUser: Подробная информация о пользователе
     Notification: Широковещательное сообщения для всех пользователей или групп
-
 }
 '/
 @enduml

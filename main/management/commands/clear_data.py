@@ -22,7 +22,7 @@ class Command(BaseCommand):
         self.delete_all(User)
         self.delete_all(ExtUser)
         self.delete_all(Event)
-        self.delete_all(ServiceRequest)
+        self.delete_all(Task)
         print('DB cleaned up successfully')
 
     def reset_sequences(self):
