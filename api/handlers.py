@@ -150,33 +150,29 @@ def resource_get(request, resource_id=None, area_id=None):
         return result
 
 
-def service_get(request, service_id=None):
-    if service_id:
-        return ServiceRequest.objects.get(pk=service_id).to_json(is_short=False)
+def task_get(request, task_id=None):
+    if task_id:
+        return Task.objects.get(pk=task_id).to_json(is_short=False)
     else:
-        sq = ServiceRequest.objects.all()
+        sq = Task.objects.all()
         sa = []
         for s in sq:
             sa.append(s.to_json(is_short=True))
         return sa
 
 
-def service_post(request):
+def task_post(request):
     xuser = request.user.extuser
     resource_id = request.POST.get("resource_id", None)
     message = request.POST.get("message", None)
-    sr = ServiceRequest.objects.create(created_by=xuser.username, resource_id=resource_id, message=message)
+    sr = Task.objects.create(created_by=xuser.username, resource_id=resource_id, message=message)
     return sr.to_json()
 
 
-def service_delete(request, service_id):
-    if not service_id: return None
-    r = ServiceRequest.objects.get(pk=service_id).delete()
-    if r[0] == 1:
-        return True
-    else:
-        return None
-
+def task_delete(request, task_id):
+    if not task_id: return None
+    r = Task.objects.get(pk=task_id).delete()
+    return True
 
 def user_get(request, user_id, username):
     """

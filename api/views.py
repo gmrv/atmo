@@ -105,7 +105,7 @@ def booking_confirmation(request, booking_id, pin):
     result = {}
     b = Booking.objects.get(pk=booking_id)
     if str(b.pin) == pin:
-        b.confirmed = True
+        b.is_confirmed = True
         b.confirmed_by = request.user.id
         b.confirmed_at = localtime(now())
         b.save()
@@ -173,31 +173,31 @@ def resource(request, resource_id=None):
 
 
 @login_required
-def service(request, service_id=None, status=None):
+def task(request, task_id=None, status=None):
     """
-    Создание / получение / удаление запросов на обслуживание ресурса                            \r\n
-    Например на уборку переговорной или рабочего места                                          \r\n
-    **GET**                                                                                     \r\n
-        Получение одного объекта если всех объектов                                             \r\n
-        /api/service           - Получить запросы;                                              \r\n
-        /api/service/1         - Получить запрос с id = 1;                                      \r\n
-    **POST**                                                                                    \r\n
-        Создание запроса на сервисное обслуживание                                              \r\n
-        resource_id           - Получить запросы;                                               \r\n
-        message               - Получить запросы связанные с ресурсом id = 1;                   \r\n
-    **DELETE**                                                                                  \r\n
-        Удаление запроса на сервисное обслуживание                                              \r\n
-        /api/service/1         - Удалить запрос с id = 1;                                       \r\n
+    Создание / получение / удаление задач для персонала                             \r\n
+    Например на уборку переговорной или рабочего места                              \r\n
+    **GET**                                                                         \r\n
+        Получение одного объекта если всех объектов                                 \r\n
+        /api/task           - Получить все задачи                                   \r\n
+        /api/task/1         - Получить задачи с id = 1;                             \r\n
+    **POST**                                                                        \r\n
+        Создание задачи для персонала                                               \r\n
+        resource_id           - Ресурс с которым связана задача;                    \r\n
+        message               - Описание задачи;                                    \r\n
+    **DELETE**                                                                      \r\n
+        Удаление запроса на сервисное обслуживание                                  \r\n
+        /api/task/1         - Удалить запрос с id = 1;                              \r\n
 
 
     """
     result = None
     if request.method == "GET":
-        result = service_get(request, service_id=service_id)
+        result = task_get(request, task_id=task_id)
     elif request.method == "POST":
-        result = service_post(request)
+        result = task_post(request)
     elif request.method == "DELETE":
-        result = service_delete(request, service_id)
+        result = task_delete(request, task_id)
     else:
         return JsonResponse({}, status=400, safe=False)
 
