@@ -15,14 +15,15 @@ class Command(BaseCommand):
 
     def clear_data(self):
         self.delete_all_links()
+        self.delete_all(Event)
+        self.delete_all(Task)
         self.delete_all(Company)
         self.delete_all(Area)
         self.delete_all(Resource)
         self.delete_all(Group)
         self.delete_all(User)
         self.delete_all(ExtUser)
-        self.delete_all(Event)
-        self.delete_all(Task)
+
         print('DB cleaned up successfully')
 
     def reset_sequences(self):

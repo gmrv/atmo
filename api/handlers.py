@@ -165,7 +165,7 @@ def task_post(request):
     xuser = request.user.extuser
     resource_id = request.POST.get("resource_id", None)
     message = request.POST.get("message", None)
-    sr = Task.objects.create(created_by=xuser.username, resource_id=resource_id, message=message)
+    sr = Task.objects.create(resource_id=resource_id, message=message)
     return sr.to_json()
 
 

@@ -1,3 +1,4 @@
+
 from datetime import datetime, timedelta
 from dateutil.tz import tzlocal
 from django.conf import settings
@@ -5,7 +6,7 @@ from django.utils.timezone import localtime, now
 from django.db import models
 from django.contrib.auth.models import User, Group
 from api.utils import datetimestring_to_ts
-from main.utils import get_pin
+from main.utils import get_pin, get_username_from_call_stack
 
 
 class CommonManager(models.Manager):
@@ -18,6 +19,14 @@ class Common(models.Model):
     is_deleted =  models.BooleanField(default=False, blank=False, null=False)
     objects = CommonManager()
     native_objects = models.Manager()
+
+    def save(self, *args, **kwargs):
+        if hasattr(self, 'created_by'):
+            if not self.created_by:
+                self.created_by = get_username_from_call_stack()
+        if hasattr(self, 'changed_by'):
+            self.changed_by = get_username_from_call_stack()
+        super().save()
 
     def delete(self, *args, **kwargs):
         self.is_deleted = True
