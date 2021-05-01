@@ -263,6 +263,42 @@ def user(request, user_id=None, username=None):
 
 
 @login_required
+def user_here(request, user_id=None, username=None):
+    """
+    Выводим только тех пользователей у которых на сегодня имеются брони рабочих мест
+    Проставляем флаг has_confirmed если есть хотябы одна подвержденная бронь на рабочее место.
+    Нужно для показа статуса пользователей
+    Если есть бронь места на сегодня - Присутствие: Планируется (посещение коворкинга)
+    Если есть поддтвержденная бронь на сегодня - Присутствие: Присутствует (в коворкинге)
+    """
+    target_date = None
+    if not target_date:
+        target_date = localtime(now()).date()
+    xuser_query = ExtUser.objects.filter(
+        booking__start_ts__year=target_date.year,
+        booking__start_ts__month=target_date.month,
+        booking__start_ts__day=target_date.day,
+        booking__resource__type=Resource.RESOURCE_TYPE_SEAT,
+    ).distinct("id")
+    result = []
+    for xu in xuser_query:
+        user_bookings = xu.booking_set.filter(
+            start_ts__year=target_date.year,
+            start_ts__month=target_date.month,
+            start_ts__day=target_date.day,
+            resource__type=Resource.RESOURCE_TYPE_SEAT,
+        )
+        has_confirmed = False
+        for ub in user_bookings:
+            if ub.is_confirmed: has_confirmed = True
+        if user_bookings:
+            result.append({"username": xu.username, "has_confirmed": has_confirmed})
+
+    response = get_response_template(code='ok', source=request.method +'::'+ request.path, result=result)
+    return JsonResponse(response, status=200, safe=False)
+
+
+@login_required
 def set_default_area(request, area_id, username=None):
     """
     Установить площадку по умолчанию для пользователя                                                              \r\n
