@@ -18,7 +18,7 @@ def index(request):
 def home(request):
     xuser = request.user.extuser
 
-    rooms = Room.objects.all()
+    rooms = Room.objects.all().order_by("name")
 
     context = {
         "user": xuser,
@@ -66,25 +66,27 @@ def qr(request, area_id=None, target_date=None):
 def room(request, room_id=None, target_date=None):
     xuser = request.user.extuser
     room = Room.objects.get(pk=room_id)
-    rooms = Room.objects.all()
+    bookings = room.booking_set.all().order_by("id")
+    rooms = Room.objects.all().order_by("name", "id")
 
     context = {
         "user": xuser,
+        "room": room,
         "rooms": rooms,
-        "room": room
+        "bookings": bookings
     }
     return render(request, 'tablet/room.html', context)
 
 @login_required
 def registration(request):
     xuser = request.user.extuser
-    xusers = ExtUser.objects.all().exclude(username='root')
+    xusers = ExtUser.objects.all().exclude(username='root').order_by("username")
     rooms = Room.objects.all()
 
     context = {
         "user": xuser,
+        "room": room,
         "users": xusers,
-        "rooms": rooms,
-        "room": room
+        "rooms": rooms
     }
     return render(request, 'tablet/registration.html', context)

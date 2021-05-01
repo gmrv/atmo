@@ -28,12 +28,12 @@ def home(request, area_id=None, target_date=None):
     if not xuser.def_area:
         return HttpResponseRedirect(reverse('main:area_select'))
 
-    seats_query = Seat.objects.filter(area=xuser.def_area)
+    seats_query = Seat.objects.filter(area=xuser.def_area).order_by("name")
     seats = []
     for s in seats_query:
         seats.append({"id": s.id, "name": s.name})
 
-    rooms_query = Room.objects.filter(area=xuser.def_area)
+    rooms_query = Room.objects.filter(area=xuser.def_area).order_by("name")
     rooms = []
     for r in rooms_query:
         rooms.append({"id": r.id, "name": r.name, "seats": r.capacity })
@@ -50,11 +50,8 @@ def home(request, area_id=None, target_date=None):
 @login_required
 def profile(request, target_date=None):
     xuser = request.user.extuser
-
-    booking = xuser.booking_set.all()
-
-    tasks = Task.objects.filter(created_by=xuser.username)
-
+    booking = xuser.booking_set.all().order_by("id")
+    tasks = Task.objects.filter(created_by=xuser.username).order_by("id")
     context = {
         'user': xuser,
         'booking': booking,
@@ -68,7 +65,7 @@ def profile(request, target_date=None):
 @login_required
 def resource(request, resource_id, target_date=None):
     xuser = request.user.extuser
-    xusers = ExtUser.objects.all().exclude(username='root')
+    xusers = ExtUser.objects.all().exclude(username='root').order_by("username")
     resource = Resource.objects.get(pk=resource_id)
     percent_of_booked_time = resource.get_percent_of_booked_time(target_date)
 
@@ -98,7 +95,7 @@ def area_select(request):
         return HttpResponseRedirect(reverse('main:home'))
 
     areas = []
-    area_query = Area.objects.filter(company=xuser.company)
+    area_query = Area.objects.filter(company=xuser.company).order_by("name")
     for a in area_query:
         areas.append({'id' : a.id, 'name' : a.name})
 

@@ -17,11 +17,11 @@ def area_get(request, area_id, username, target_date):
 
     else:
         # Если нет идентификатора возвращаем все
-        area_query = Area.objects.all()
+        area_query = Area.objects.all().order_by('name')
         if username:
             # Возвращаем только площадки компании пользователя
             xuser = ExtUser.objects.get(username=username)
-            area_query = area_query.exclude(~Q(company=xuser.company))
+            area_query = area_query.exclude(~Q(company=xuser.company)).order_by('name')
         area_list = []
         for a in area_query:
             area_list.append(a.to_json(is_short=True, target_date=target_date))
@@ -41,9 +41,9 @@ def booking_get(request, booking_id, date):
         if date:
             ts_start = datetimestring_to_ts(date + " 00:00", "%Y-%m-%d %H:%M")
             ts_end = ts_start + timedelta(days=1)
-            booking_query = Booking.objects.filter(Q(start_ts__gte=ts_start) & Q(start_ts__lte=ts_end))
+            booking_query = Booking.objects.filter(Q(start_ts__gte=ts_start) & Q(start_ts__lte=ts_end)).order_by('id')
         else:
-            booking_query = Booking.objects.all()
+            booking_query = Booking.objects.all().order_by('id')
         result = []
         for b in booking_query:
             result.append(b.to_json())
@@ -154,7 +154,7 @@ def task_get(request, task_id=None):
     if task_id:
         return Task.objects.get(pk=task_id).to_json(is_short=False)
     else:
-        sq = Task.objects.all()
+        sq = Task.objects.all().order_by('id')
         sa = []
         for s in sq:
             sa.append(s.to_json(is_short=True))
@@ -174,6 +174,7 @@ def task_delete(request, task_id):
     r = Task.objects.get(pk=task_id).delete()
     return True
 
+
 def user_get(request, user_id, username):
     """
     Получаем одного или всех пользователей
@@ -189,7 +190,7 @@ def user_get(request, user_id, username):
             xuser = ExtUser.objects.get(username=username)
         return xuser.to_json(is_short=False)
     else:
-        xusers = ExtUser.objects.filter(is_active=True)
+        xusers = ExtUser.objects.filter(is_active=True).order_by('username')
         result = []
         for u in xusers:
             result.append(u.to_json(is_short=True))

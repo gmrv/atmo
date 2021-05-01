@@ -499,7 +499,7 @@ class Booking(Common):
             "user": self.user_id,
             "start_ts": self.start_ts,
             "end_ts": self.end_ts,
-            "confirmed": self.is_confirmed,
+            "is_confirmed": self.is_confirmed,
             "confirmed_at": self.confirmed_at,
             "confirmed_by": self.confirmed_by,
             "pin": self.pin,

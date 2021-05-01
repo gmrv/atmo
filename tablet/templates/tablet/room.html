@@ -28,7 +28,7 @@
               </thead>
 
               <tbody>
-                {% for b in room.booking_set.all %}
+                {% for b in bookings %}
                 <tr>
                   <td>{{ b.resource.name }}</td>
                   <td>{{ b.resource.area.name }}</td>
@@ -63,7 +63,7 @@
           </div>
           <div class="row">
             <div class="input-field col s12 center">
-              <input id="id-pin" type="password" class="validate center">
+              <input id="id-pin" type="text" class="validate center">
               <label for="id-pin">PIN</label>
             </div>
           </div>
