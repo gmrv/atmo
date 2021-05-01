@@ -170,19 +170,15 @@ class Resource(Common):
     Ресурсы
     Родительский объект для всех объектов которые могут быть забронированы
     """
-    RESOURCE_TYPE_ALL = 'resource'
     RESOURCE_TYPE_SEAT = 'seat'
     RESOURCE_TYPE_ROOM = 'room'
+    RESOURCE_TYPE = (
+        (RESOURCE_TYPE_SEAT, 'Рабочее место'),
+        (RESOURCE_TYPE_ROOM, 'Переговорная'),
+    )
     area = models.ForeignKey(Area, help_text='Родительская площадка', on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
+    type = models.CharField(help_text='Тип ресурса', max_length=4, choices=RESOURCE_TYPE, blank=True, null=True)
 
-    @property
-    def type(self):
-        """ Возвращает тип ресурса """
-        if hasattr(self, 'room'):
-            return self.RESOURCE_TYPE_ROOM
-        if hasattr(self, 'seat'):
-            return self.RESOURCE_TYPE_SEAT
-        return self.RESOURCE_TYPE_ALL
 
     def __str__(self):
         return ("Id: %s; Type: %s; Name: %s;" % (self.id, type, self.name))
@@ -326,6 +322,10 @@ class Room(Resource):
     has_av = models.BooleanField(help_text='Наличие аудио/видео аппаратуры', default=False)
     has_phone = models.BooleanField(help_text='Наличие телефона', default=False)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.type = Resource.RESOURCE_TYPE_ROOM
+
     def to_json(self, is_short=False, target_date=None):
         result = {
             "id": self.id,
@@ -359,6 +359,10 @@ class Seat(Resource):
     )
     status = models.CharField(help_text='Статус места', max_length=11, choices=AREA_TYPE, default=STATUS_AVAILABLE)
     owner = models.ForeignKey(User, help_text= 'За кем закреплено', on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.type = Resource.RESOURCE_TYPE_SEAT
 
     def to_json(self, is_short=False, target_date=None):
         result = {
