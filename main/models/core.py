@@ -122,26 +122,20 @@ class ExtUser(User):
     def_area = models.ForeignKey(Area, help_text='Площадка по умолчанию', on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
 
     def to_json(self, is_short=False):
-        if is_short:
-            result = {
-                "id": self.id,
-                "username": self.username,
-            }
-        else:
-            result = {
-                "id": self.id,
-                "username": self.username,
-                "first_name": self.first_name,
-                "middle_name": self.middle_name,
-                "last_name": self.last_name,
-                "email": self.email,
-                "is_superuser": self.is_superuser,
-                "is_staff": self.is_staff,
-                "is_active": self.is_active,
-                "company_id": self.company_id,
-                "booking_set": []
-            }
-
+        result = {
+            "id": self.id,
+            "username": self.username,
+            "first_name": self.first_name,
+            "middle_name": self.middle_name,
+            "last_name": self.last_name,
+            "email": self.email,
+            "is_superuser": self.is_superuser,
+            "is_staff": self.is_staff,
+            "is_active": self.is_active,
+            "company_id": self.company_id,
+            "booking_set": []
+        }
+        if not is_short:
             booking_set = self.booking_set.all()
             booking_arr = []
             for b in booking_set:
@@ -151,6 +145,7 @@ class ExtUser(User):
                     "end_ts": b.end_ts
                 })
             result["booking_set"] = booking_arr
+
         return result
 
 
