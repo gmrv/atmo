@@ -263,7 +263,7 @@ def user(request, user_id=None, username=None):
 
 
 @login_required
-def user_here(request, user_id=None, username=None):
+def user_here(request, target_date=None):
     """
     Выводим только тех пользователей у которых на сегодня имеются брони рабочих мест
     Проставляем флаг has_confirmed если есть хотябы одна подвержденная бронь на рабочее место.
@@ -271,7 +271,6 @@ def user_here(request, user_id=None, username=None):
     Если есть бронь места на сегодня - Присутствие: Планируется (посещение коворкинга)
     Если есть поддтвержденная бронь на сегодня - Присутствие: Присутствует (в коворкинге)
     """
-    target_date = None
     if not target_date:
         target_date = localtime(now()).date()
     xuser_query = ExtUser.objects.filter(
@@ -279,7 +278,7 @@ def user_here(request, user_id=None, username=None):
         booking__start_ts__month=target_date.month,
         booking__start_ts__day=target_date.day,
         booking__resource__type=Resource.RESOURCE_TYPE_SEAT,
-    ).distinct("id")
+    ).distinct("id", "first_name").order_by("id", "first_name")
     result = []
     for xu in xuser_query:
         user_bookings = xu.booking_set.filter(
@@ -289,10 +288,41 @@ def user_here(request, user_id=None, username=None):
             resource__type=Resource.RESOURCE_TYPE_SEAT,
         )
         has_confirmed = False
+        resources = []
         for ub in user_bookings:
             if ub.is_confirmed: has_confirmed = True
+            resources.append(ub.resource.to_json(is_short=True))
         if user_bookings:
-            result.append({"username": xu.username, "has_confirmed": has_confirmed})
+            result.append({"user": xu.to_json(is_short=True), "resources": resources, "has_confirmed": has_confirmed})
+
+    response = get_response_template(code='ok', source=request.method +'::'+ request.path, result=result)
+    return JsonResponse(response, status=200, safe=False)
+
+
+@login_required
+def user_register(request, user_id, target_date=None):
+    if not target_date:
+        target_date = localtime(now()).date()
+
+    xuser = ExtUser.objects.get(pk=user_id)
+    booking_query = xuser.booking_set.filter(
+        start_ts__year=target_date.year,
+        start_ts__month=target_date.month,
+        start_ts__day=target_date.day,
+        resource__type=Resource.RESOURCE_TYPE_SEAT,
+    )
+    confirmed_bookings = []
+    for b in booking_query:
+        b.is_confirmed = True
+        b.confirmed_by = request.user.username
+        b.confirmed_at = now()
+        b.save()
+        confirmed_bookings.append(b.to_json())
+
+    result = {
+        "confirmed" : len(confirmed_bookings),
+        "bookings"  : confirmed_bookings,
+    }
 
     response = get_response_template(code='ok', source=request.method +'::'+ request.path, result=result)
     return JsonResponse(response, status=200, safe=False)

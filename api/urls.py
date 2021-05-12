@@ -48,6 +48,7 @@ urlpatterns = [
     path('user/<int:user_id>', views.user, name='user'),
     path('user/<str:username>', views.user, name='user'),
     path('user/here/', views.user_here, name='user_here'),
+    path('user/register/<int:user_id>', views.user_register, name='user_register'),
     # Установить площадку по умолчанию для пользователя из request.user
     path('user/set_default_area/<int:area_id>/', views.set_default_area, name='get_available_areas'),
     # Установить площадку по умолчанию для пользователя из url-параметра
