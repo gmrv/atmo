@@ -18,22 +18,37 @@
             <tr>
               <th>ФИО</th>
               <th>Почта</th>
-              <th>Количество броней</th>
+              <th>Места</th>
+              <th>Присутствие</th>
               <th></th>
             </tr>
           </thead>
-          <tbody>
-            {% for u in users %}
-            <tr>
-              <td>{{ u.first_name }} {{ u.last_name }} {{ u.middle_name }}</td>
-              <td>{{ u.email }}</td>
-              <td>{{ u.booking_set.count }}</td>
-              <td><a data-id="{{ u.id }}" class="waves-effect waves-light btn-small">Зарегистрировать</a></td>
-            </tr>
-            {% endfor %}
+          <tbody id="id-tbody-users">
+{#            {% for u in users %}#}
+{#            <tr>#}
+{#              <td>{{ u.first_name }} {{ u.last_name }} {{ u.middle_name }}</td>#}
+{#              <td>{{ u.email }}</td>#}
+{#              <td>{{ u.booking_set.count }}</td>#}
+{#              <td><a data-id="{{ u.id }}" class="waves-effect waves-light btn-small">Зарегистрировать</a></td>#}
+{#            </tr>#}
+{#            {% endfor %}#}
           </tbody>
         </table>
       </div>
+    </div>
+
+    <div class="hiddendiv">
+      <table>
+        <tbody id="id-tbody-template">
+          <tr>
+            <td id="id-td-fio"></td>
+            <td id="id-td-email"></td>
+            <td id="id-td-seat"></td>
+            <td id="id-td-present"></td>
+            <td id="id-td-button"></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
 {% endblock %}
@@ -41,9 +56,43 @@
 {% block extrajs %}
   <script>
     $(document).ready(function() {
-        $('.btn-small').on('click', function(e){
-          log($(e.currentTarget).data("id"))
-        });
+      get_user_list()
+      setInterval(get_user_list, 5000)
     });
+
+    function get_user_list(){
+      request({
+        url:'/api/user/here/',
+        type:'GET',
+        ondone:function (response){
+          let items = response.result;
+          $('#id-tbody-users').html("")
+          let html = ""
+          items.forEach(function(item){
+            $('#id-td-fio').html(item.user.last_name + ' ' + item.user.first_name + ' ' + item.user.middle_name)
+            $('#id-td-email').html(item.user.email)
+            $('#id-td-seat').html(item.resources.map(function (i){return i.name + " "}))
+            $('#id-td-present').html(item.has_confirmed ? 'Присутствует' : 'Планируется')
+            $('#id-td-button').html('<a data-id="' + item.user.id + '" class="waves-effect waves-light btn-small"' + (item.has_confirmed ? 'disabled' : '') + '>Зарегистрировать</a>')
+
+            let line = $('#id-tbody-template').html()
+            html = html + line;
+          })
+          $('#id-tbody-users').html(html);
+
+          $('.btn-small').on('click', function (e){regUser($(e.currentTarget).data('id'))});
+
+        }
+      });
+    }
+
+    function regUser(id){
+      request({
+        url: '/api/user/register/' + id,
+        type: 'GET',
+        ondone: get_user_list
+      })
+    }
+
   </script>
 {% endblock %}
