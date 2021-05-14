@@ -1,0 +1,166 @@
+{% load settings_value %}
+{% load static  %}
+{% load i18n %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <meta name="DC.title" content="{% settings_value 'SITE_NAME' %}" />
+  <title>{% block title %}{% settings_value 'SITE_NAME' %}{% endblock %} | {% block sub-title %}{% endblock %}</title>
+  <link rel="shortcut icon" href="{%  static 'img/favicon.ico' %}">
+
+  {% block scripts %}
+    <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'js/jquery-ui-1.12.1.min.js' %}"></script>
+    <script src="{% static 'js/jquery-ui-1.12.1.min.js' %}"></script>
+
+    <!-- Compiled and minified JavaScript -->
+    <script src="{% static 'js/materialize.js' %}"></script>
+    <script src="{% static 'js/atmo.js' %}"></script>
+
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="{% static 'css/materialize.css' %}">
+    <link rel="stylesheet" href="{% static 'css/atmo.css' %}">
+
+    <!-- Fonts are fun -->
+    <link href="{% static 'fonts/roboto/Roboto-Regular.eot' %}" rel="application/vnd.ms-fontobject">
+
+  {% endblock %}
+
+
+  {% block pagestyle %}{% endblock %}
+
+  {% if not request.user.is_staff %}
+    <script>
+        // web counters here
+    </script>
+  {% endif %}
+
+  {%block sub-head %}{% endblock %}
+
+<!--  {% block style %}{% endblock %}-->
+  <style>
+  </style>
+</head>
+
+
+<body>
+    {% block body %}
+      {% block top_div %}
+      {% endblock %}
+  
+      <!-- Page  -->
+      {% block top_nav %}
+  
+        <nav>
+          <div class="nav-wrapper" style="background-color: #6e8cee;">
+            <a class="atmo-link" href="/main/home" class="brand-logo">Logo</a>
+            <ul id="nav-mobile" class="right">
+            <li><a class="atmo-link" data="/staff/home">Обзор</a></li>
+            <li><a class="atmo-link" data="/staff/bookings">Бронирования</a></li>
+            <li><a class="atmo-link" data="/staff/members">Пользователи</a></li>
+            <li><a class="atmo-link" data="/staff/add_users">Добавить пользователя</a></li>
+            <li></li>
+            <li><a class="atmo-link" data="/main/home"><i class="material-icons">home</i></a></li>
+            <li><a href="/tablet/home"><i class="material-icons">tablet</i></a></li>
+            <li><a href="/staff/home"><i class="material-icons">build</i></a></li>
+            <li><a href="/logout">Выход</a></li>
+            </ul>
+          </div>
+        </nav>
+      {% endblock %}
+  
+    {% endblock %} <!-- block body-->
+
+    {% block side-nav %}
+    {% endblock %}
+
+    {% block lower_nav %}{% endblock %}
+
+    {% block main_body %}
+      {% block content %}{% endblock %}
+    {% endblock %}
+
+    {% block floating_content %}{% endblock %}
+
+    {% block bottom_div %}{% endblock %}
+
+    {% block extrajs %}
+    {% endblock %}
+
+    {% csrf_token %}
+
+    <script>
+      let isDebug = true
+
+      let helper = {
+        "user_id": "{{ user.id }}",
+        "user_name": "{{ user.username }}",
+        "user_company_id": "{{ user.company_id }}",
+        "user_default_area_id": "{{ user.def_area_id }}",
+        "target_date": "{{ target_date }}",
+      }
+  
+      let datepickerIni = {
+          format: 'yyyy-mm-dd',
+          defaultDate: new Date("{{ target_date }}"),
+          setDefaultDate: true,
+          firstDay: 1,
+          i18n: {
+            months: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"],
+            monthsShort: ["Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"],
+            weekdays: ["Воскресенье", "Понедельник","Вторник", "Среда", "Четверг", "Пятница", "Суббота"],
+            weekdaysShort: ["Вс", "Пн","Вт", "Ср", "Чт", "Пт", "Сб"],
+            weekdaysAbbrev: ["Вс", "Пн","Вт", "Ср", "Чт", "Пт", "Сб"],
+            cancel: 'Отмена',
+            clear: 'Очистить',
+            done: 'Ок'
+          }
+      }
+  
+      $(document).ready(function() {
+  
+        // Инициализация контролов от Materialize
+        M.AutoInit();
+        $('.datepicker').datepicker(datepickerIni);
+        $('.timepicker').timepicker({
+          "twelveHour": false,
+          i18n: {
+            cancel: 'Отмена',
+            clear: 'Очистить',
+            done: 'Ок'
+          }
+        });
+  
+        // Подключаем csrt-токен для пост запросов
+        let csrftoken = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+        $.ajaxSetup({
+          beforeSend: function(xhr, settings) {
+              if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                  // Only send the token to relative URLs i.e. locally.
+                  xhr.setRequestHeader("X-CSRFToken", csrftoken);
+              }
+          }
+        });
+  
+        //
+        $('#id-datepicker-target').on('change', function(e){
+          helper.target_date = $('#id-datepicker-target').val()
+          onChangeDatepickerTarget(e)
+        })
+  
+        $('.atmo-link').on('click', function (e){
+          //alert($(e.currentTarget).attr('href')+'/'+helper.target_date)
+          window.location.href = $(e.currentTarget).attr('data')+'/'+ helper.target_date
+        })
+  
+  
+      });
+    </script>
+  
+  </body>
+  </html>
+  

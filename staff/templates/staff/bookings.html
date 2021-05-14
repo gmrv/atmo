@@ -1,0 +1,102 @@
+{% extends 'staff/base.html' %}
+{% load settings_value %}
+{% load static %}
+{% load i18n %}
+{% block sub-title %}Обзор{% endblock %}
+
+{% block content %}
+    <div id="new-users" class="container">
+        <h5><b>Бронирования</b></h5>
+        <br>      
+
+        <div class="row">
+            <form action="." method="POST">            
+                {{ form.non_field_errors }}
+                {% for field in form %}
+                    {% if field.name != 'desc' %}
+                        {{ field.label }}
+                        {{ field }}
+                    {% else %}
+                        <div class="row">
+                            <label for="{{ field.id_for_label }}">
+                                <input type="checkbox" id="{{ field.id_for_label }}"
+                                    name="{{ field.html_name }}">
+                                <span>{{ field.label }}</span>
+                            </label>
+                        </div>
+                    {% endif %}
+                    <div style="color: #933;">{{ field.errors }}</div>
+                {% endfor %}
+                <input class='btn' type="submit" value="Сгенерировать" />
+                {% csrf_token %}
+                </form>
+
+        </div>
+
+        
+
+        <div class="row">
+            <p>Всего: {{bookings.count}}</p>
+            <div class="col s12">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Площадка</th>
+                            <th>Место</th>
+                            <th>Имя пользователя</th>
+                            <th>Логин</th>
+                            <th>Время начала</th>
+                            <th>Время окончания</th>
+                            <th>Присутствие</th>
+                            <th>Время создания</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+    
+                    <tbody>
+                        {% for b in bookings %}
+                            <tr>
+                                <td>{{ b.resource.area.name }}</td>
+                                <td>{{ b.resource.name }}</td>
+                                <td>{{ b.user.first_name }} {{ b.user.last_name }}</td>
+                                <td>{{ b.user }}</td>
+                                <td>{{ b.start_ts }}</td>
+                                <td>{{ b.end_ts }}</td>
+                                <td>{{ b.is_confirmed | yesno:"Да, Нет" }}</td>
+                                <td>{{ b.created_at }}</td>
+                                <td><div id="id-delete-{{ b.id }}" data-id="{{ b.id }}" class="booking-delete-button" href=""><i class="material-icons right trash">delete</i></div></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block extrajs %}
+<script>
+    let flag = false
+    $(document).ready(function() {
+
+        $(".booking-delete-button").on('click', function(e){
+          var confirm_booking = confirm("Вы уверены, что хотите отменить бронирование?");
+          if (confirm_booking) {
+              request({url:'/api/booking/' + $(e.currentTarget).data('id'), type:'DELETE', data:{}, ondone:onDeleteSuccess});
+            }
+        })
+
+      flag = true
+    });
+
+
+    function onChangeDatepickerTarget(e){
+    }
+
+    function onDeleteSuccess(response){
+      window.location.reload();
+    }
+
+</script>
+{% endblock %}

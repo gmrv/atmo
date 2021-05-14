@@ -16,5 +16,7 @@ urlpatterns = [
     path('', root_views.root, name='root'),
     path('main/', include(('main.urls', 'main'), namespace='main')),
     path('tablet/', include(('tablet.urls', 'tablet'), namespace='tablet')),
-    path('api/', include(('api.urls', 'api'), namespace='api'))
+    path('api/', include(('api.urls', 'api'), namespace='api')),
+    
+    path('staff/', include('staff.urls', namespace='staff'))
 ]
