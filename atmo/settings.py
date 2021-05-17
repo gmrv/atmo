@@ -24,6 +24,7 @@ config.read(str(CURR_DIR) + '/settings.ini')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config['Django']['SecretKey']
+ORGANIZATION_ID = config['Hinted']['OrganizationId']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
