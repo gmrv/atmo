@@ -14,10 +14,10 @@ from .forms import *
 
 @staff_member_required
 def index(request): 
-    return HttpResponseRedirect(reverse('staff:members'))
+    return HttpResponseRedirect(reverse('staff:home'))
 
 @staff_member_required
-def members(request):
+def home(request):
     today = localtime(now())
     days_back = 30
     if 'days_back' in request.GET:
@@ -28,7 +28,7 @@ def members(request):
         'new_users': new_users,
         'days_back': days_back,
     }
-    return render(request, 'staff/members.html', context)
+    return render(request, 'staff/home.html', context)
 
 @staff_member_required
 def add_users(request):
