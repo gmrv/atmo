@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main',
     'tablet',
+    'staff',
 ]
 
 MIDDLEWARE = [
@@ -83,7 +84,7 @@ WSGI_APPLICATION = 'atmo.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'atmodb',
+        'NAME': config['Db']['DbName'],
         'USER': config['Db']['DbUser'],
         'PASSWORD': config['Db']['DbPassword'],
         'HOST': 'db',

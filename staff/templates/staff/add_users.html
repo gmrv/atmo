@@ -1,0 +1,97 @@
+{% extends 'staff/base.html' %}
+{% load static %}
+{% load i18n %}
+{% block sub-title %}Добавить пользователя{% endblock %}
+
+{% block content %}
+    
+    <div id="visitor-form" class="container">
+        <h5><b>Добавить пользователя</b></h5>
+        <br>
+        <form action="{% url 'staff:add_users' %}" method="post" enctype="multipart/form-data">
+        {{ add_user_form.non_field_errors }}
+        {% for field in add_user_form %}
+            {% if field.name != 'staff' %}
+                {{ field.label_tag }}
+                {{ field }}
+            {% else %}
+                <div class="row">
+                    <label for="{{ field.id_for_label }}">
+                        <input type="checkbox" id="{{ field.id_for_label }}"
+                            name="{{ field.html_name }}">
+                        <span>{{ field.label }}</span>
+                    </label>
+                </div>
+            {% endif %}
+            <div style="align:center; color: #933;">{{ field.errors }}</div>
+        {% endfor %}
+        <input class='btn' type="submit" value="Добавить" style='margin-bottom: 2%;'/>
+        {% csrf_token %}
+        </form>
+    </div>
+
+    <div id="new-users" class="container">      
+        {% if new_users %}
+            <h6>Новые пользователи за прошедшие {{ days_back }} дней:</h6>
+            <table class="" style='margin-bottom: 5%;'>
+            <tr>
+                <th class='left'>Имя</th>
+                <th class='center'>Логин</th>
+                <th class='center'>Email</th>
+                <th class='center'>Персонал</th>
+                <th class='center'>Дата создания</th>
+                <th></th>
+            </tr>
+        
+            {% for user in new_users %}
+                <tr class='row'>
+                <td>{{ user.last_name }} {{ user.first_name }} {{ user.middle_name }}</td>
+                <td class='center'>{{ user.username }}</td>
+                <td class='center'>{{ user.email }}</td>
+                <td class='center'>{{ user.is_staff|yesno:"Да,Нет" }}</td>
+                <td class='center'>{{ user.date_joined }}</td>
+                <td></td>
+                </tr>
+            {% endfor %}
+            </table>
+        {% endif %}
+
+        <div class="row">
+            <a href="{% url 'staff:members' %}">Все пользователи</a>
+        </div>
+        
+        <br>
+    </div>
+
+
+      
+{% endblock %}
+
+{% block extrajs %}
+  <script>
+    (function() {
+      {% for message in messages %}
+        {% if message.tags == 'error' %}
+          Materialize.toast('{{ message }}', 60000, 'error-msg msg');
+        {% else %}
+          Materialize.toast('{{ message }}', 5000, '{{ message.tags }}-msg msg');
+        {% endif %}
+      {% endfor %}
+
+      $(document).on('click', '#toast-container .toast', function() {
+        $(this).fadeOut(function(){
+          $(this).remove();
+        });
+      });
+    })();
+
+    $(document).ready(function() {
+      $('.button-collapse').sideNav();
+      $('.collapsible').collapsible();
+    });
+
+    $(document).ready(function(){
+      $('select').formSelect();
+    });
+  </script>
+{% endblock %}

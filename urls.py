@@ -18,3 +18,7 @@ urlpatterns = [
     path('tablet/', include(('tablet.urls', 'tablet'), namespace='tablet')),
     path('api/', include(('api.urls', 'api'), namespace='api'))
 ]
+
+urlpatterns += [
+    path('staff/', include('staff.urls', namespace='staff')),
+]

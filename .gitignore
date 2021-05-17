@@ -2,3 +2,14 @@
 /docker-compose.yml
 /atmo/settings.ini
 /docs/memo.txt
+
+.svn
+*.pyc
+*.class
+.DS_Store
+.project
+.settings
+__pycache__/
+.vscode
+.venv/
+venv/
