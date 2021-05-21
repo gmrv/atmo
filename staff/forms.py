@@ -18,7 +18,13 @@ COMPANY_KEYS = [
     (None, '-')
 ]
 
-companies = list(Company.objects.all().values('id', 'name'))
+companies = list()
+try:
+    # Иначе вываливается ошибка при иницииации, при попытке migrate или migrate main zero
+    companies = list(Company.objects.all().values('id', 'name'))
+except Exception:
+    pass
+
 for c in companies:
     COMPANY_KEYS.append((c['id'], c['name']))
 
