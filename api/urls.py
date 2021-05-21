@@ -54,4 +54,8 @@ urlpatterns = [
     # Установить площадку по умолчанию для пользователя из url-параметра
     path('user/set_default_area/<int:area_id>/<str:username>', views.set_default_area, name='get_available_areas'),
 
+    # SMPT
+    path('smtp/test/<str:email>', views.smpt_test, name='smtp_test'),
+
+
 ]

@@ -45,3 +45,24 @@ def datetimestring_to_ts(datetimestring, template):
     )
 
 
+def get_mail_template():
+    html = """\
+        <html>
+            <head></head>
+            <body>
+                <p>Здравствуйте!</p>
+                <br>
+                <p>
+                    <div>Это тестовое письмо</div>
+                    <div>Вот так можно подставлять значения из скрипта: %s</div>
+                </p>
+
+                <br/>
+                
+                <p>
+                    <div>С наилучшими пожеланиями, команда разработки системы бронирования "Атмосфера"</div>
+                </p>
+          </body>
+        </html>
+    """
+    return html

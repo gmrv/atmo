@@ -3,5 +3,14 @@ Escape: %%
 SecretKey: ***
 
 [Db]
+DbName: ***
 DbUser: ***
 DbPassword: ***
+
+[Hinted]
+OrganizationId: ***
+
+[SMTP]
+Host: ***
+Port: ***
+Sender: ***

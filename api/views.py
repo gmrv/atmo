@@ -5,7 +5,9 @@ from django.urls import reverse
 from django.utils.timezone import localtime, now
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 @login_required
 def index(request):
@@ -346,4 +348,21 @@ def set_default_area(request, area_id, username=None):
     response = get_response_template(code='ok', source=request.method +'::'+ request.path, result=None)
     return JsonResponse(response, status=200, safe=False)
 
+@login_required
+def smpt_test(request, email):
 
+    recipients = []
+    recipients.append(email)
+    msg = MIMEMultipart('alternative')
+    msg['Subject'] = "SMTP Test"
+    msg['From'] = settings.SMTP_SENDER
+    msg['To'] = ', '.join(recipients)
+    part = MIMEText(get_mail_template() % email, 'html')
+    msg.attach(part)
+
+    s = smtplib.SMTP(host=settings.SMTP_HOST, port=settings.SMTP_PORT)
+    s.sendmail(settings.SMTP_SENDER, recipients, msg.as_string())
+    s.quit()
+
+    response = get_response_template(code='ok', source=request.method +'::'+ request.path, result=email)
+    return JsonResponse(response, status=200, safe=False)

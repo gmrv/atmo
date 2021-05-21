@@ -147,3 +147,7 @@ SITE_NAME = "АТМОСФЕРА"
 OPEN_TIME = '08:00'
 CLOSE_TIME = '19:00'
 BOOKING_WINDOW = 7 # days
+
+SMTP_SENDER = config['SMTP']['Sender']
+SMTP_HOST = config['SMTP']['Host']
+SMTP_PORT = config['SMTP']['Port']
