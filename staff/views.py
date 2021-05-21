@@ -57,3 +57,10 @@ def add_users(request):
         'companies': companies,
     }
     return render(request, 'staff/add_users.html', context)
+
+
+@staff_member_required
+def smtp(request):
+    context = {
+    }
+    return render(request, 'staff/smtp.html', context)
