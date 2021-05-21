@@ -14,10 +14,20 @@ class Command(BaseCommand):
         cos = Company.objects.create(name="АО \"Fossa\"", short_name="АО \"Fossa\"", full_name="АО \"Fossa\"")
         # Площадка 1
         a = Area.objects.create(name="Fossa Коворкинг №1", type=Area.AREA_TYPE_COWORKING, map_url="/static/img/cons/map-01.html")
+
+        # Создаем рабочие места
         for n in range(1, 21):
             m = Seat.objects.create(name=str(n).zfill(2))
             a.resource_set.add(m)
         a.save()
+
+        # Создаем ячейки хранения
+        for n in range(1, 11):
+            c = Cell.objects.create(name=str(n).zfill(2))
+            a.resource_set.add(c)
+        a.save()
+
+
         r1 = Room.objects.create(name='A1', capacity=4)
         r2 = Room.objects.create(name='A2', capacity=4)
         a.resource_set.add(r1, r2)
@@ -59,7 +69,7 @@ class Command(BaseCommand):
         u.save()
 
         ivan = ExtUser.objects.create(username="ivanov-ii", email="ivanov-ii@a.com", company=cos,
-            first_name="Иван", middle_name="Иванович", last_name="Иванов")
+            first_name="Иван", middle_name="Иванович", last_name="Иванов", is_staff=True, is_superuser=True)
         ivan.set_password("1234")
         ivan.save()
         # Бронируем постоянное место

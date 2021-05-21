@@ -1,0 +1,71 @@
+{% extends 'main/base.html' %}
+{% load static %}
+{% load i18n %}
+{% block sub-title %}Добро пожаловать{% endblock %}
+
+{% block style %}{% endblock %}
+
+{% block content %}
+    <div class="container">
+
+      <div class="row">
+        <div class="col s12">Ячейки:</div>
+        <div id="id-div-area-name" class="col s9"></div>
+      </div>
+
+      <div class="row">
+        <div class="col s12 cells-container">
+          {% for c in cells %}
+            <div
+              id="id-cell-{{ c.id }}"
+              class="cell btn {% if c.p > 80 %} booked {% elif c.p > 0 %} partly {% else %} free {% endif %}"
+            >
+              {{ c.name }}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+
+
+    </div>
+{% endblock %}
+
+{% block extrajs %}
+  <script>
+    $(document).ready(function() {
+      addHandlers();
+    });
+
+    function addHandlers(){
+      $(".cell").on("click", function(e){
+        let cellId = e.currentTarget.id.split('id-cell-')[1]
+        window.location.href = '/main/resource/' + cellId + '/' + helper.target_date;
+      })
+    }
+
+    function onChangeDatepickerTarget(e) {
+      let url = "/api/area/" + helper.user_default_area_id + "/" + helper.target_date
+      request({url: url, type: 'GET', ondone: drawCells})
+    }
+
+    function drawCells(response) {
+      let cells = response.result.resources.cells
+      html = ""
+      for (let key in cells) {
+        let classes = "cell btn"
+        if(cells[key].percent_of_booked_time > 80){
+          classes += " booked"
+        } else if(cells[key].percent_of_booked_time > 0){
+          classes += " partly"
+        } else {
+          classes += " free"
+        }
+        html = html + '<div id="id-cell-' + cells[key].id + '" class="' + classes + '">' + cells[key].name + '</div>'
+      }
+      $(".cells-container").html(html)
+      addHandlers()
+    }
+
+  </script>
+{% endblock %}

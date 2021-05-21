@@ -70,7 +70,7 @@
       $("#id-div-area-name").text(area_name)
       $("#id-div-seats").text(seats.length)
       $("#id-div-rooms").text(rooms.length)
-      $("#id-div-map-container").html('<div w3-include-html="' + area_map + '?a=3"></div>')
+      $("#id-div-map-container").html('<div w3-include-html="' + area_map + '?nocash=9"></div>')
       switchMapLoading(true);
       includeHTML(getResource);
     }
@@ -88,6 +88,14 @@
       $( "g[id^='table-']" ).on('click', function (e){
         let seatId = $(e.currentTarget).data()["id"]
         window.location.href = '/main/resource/' + seatId + '/' + helper.target_date;
+      })
+
+      $("#id-cells").removeClass('st151')
+      $("#id-cells").addClass('btn')
+      $("#id-cells").addClass('cells')
+      $("#id-cells").on('click', function (e){
+        let seatId = $(e.currentTarget).data()["id"]
+        window.location.href = '/main/cells/' + helper.user_default_area_id + '/' + helper.target_date;
       })
     }
 

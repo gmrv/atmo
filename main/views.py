@@ -105,3 +105,23 @@ def area_select(request):
         'target_date': datetime.today().strftime('%Y-%m-%d')
     }
     return render(request, 'main/area_select.html', context)
+
+
+@login_required
+def cells(request, area_id, target_date=None):
+    xuser = request.user.extuser
+
+    if not target_date:
+        target_date = datetime.today().strftime('%Y-%m-%d')
+
+    cells_query = Cell.objects.filter(area=area_id).order_by("name")
+    cells = []
+    for c in cells_query:
+        cells.append({"id": c.id, "name": c.name, "p": c.get_percent_of_booked_time(target_date)})
+
+    context = {
+        'user': xuser,
+        'cells': cells,
+        'target_date': target_date
+    }
+    return render(request, 'main/cells.html', context)

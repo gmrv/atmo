@@ -106,7 +106,8 @@ class Area(Common):
     def get_resources_json(self, is_short=False, target_date=None):
         result = {
             "rooms": [],
-            "seats": []
+            "seats": [],
+            "cells": []
         }
         for r in self.resource_set.all():
                 result[r.type + "s"].append(r.to_json(is_short, target_date))
@@ -167,9 +168,11 @@ class Resource(Common):
     """
     RESOURCE_TYPE_SEAT = 'seat'
     RESOURCE_TYPE_ROOM = 'room'
+    RESOURCE_TYPE_CELL = 'cell'
     RESOURCE_TYPE = (
         (RESOURCE_TYPE_SEAT, 'Рабочее место'),
         (RESOURCE_TYPE_ROOM, 'Переговорная'),
+        (RESOURCE_TYPE_ROOM, 'Ячейка хранения'),
     )
     area = models.ForeignKey(Area, help_text='Родительская площадка', on_delete=models.deletion.CASCADE, blank=True, null=True, default=None)
     type = models.CharField(help_text='Тип ресурса', max_length=4, choices=RESOURCE_TYPE, blank=True, null=True)
@@ -300,6 +303,8 @@ class Resource(Common):
             return self.room.to_json(is_short, target_date)
         if hasattr(self, 'seat'):
             return self.seat.to_json(is_short, target_date)
+        if hasattr(self, 'cell'):
+            return self.cell.to_json(is_short, target_date)
 
 
 class Room(Resource):
@@ -367,6 +372,25 @@ class Seat(Resource):
             "area": self.area_id,
             "status": self.status,
             "owner": self.owner_id,
+            "calendar": {} if is_short else self.get_calendar(target_date),
+            "percent_of_booked_time": self.get_percent_of_booked_time(target_date)
+        }
+        return result
+
+
+class Cell(Resource):
+    """
+    Ячейка хранения
+    """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.type = Resource.RESOURCE_TYPE_CELL
+
+    def to_json(self, is_short=False, target_date=None):
+        result = {
+            "id": self.id,
+            "name": self.name,
+            "area": self.area_id,
             "calendar": {} if is_short else self.get_calendar(target_date),
             "percent_of_booked_time": self.get_percent_of_booked_time(target_date)
         }

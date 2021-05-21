@@ -13,6 +13,8 @@ urlpatterns = [
     path('home/<int:area_id>/<slug:target_date>', views.home, name='home'),
     path('home/<slug:target_date>', views.home, name='home'),
 
+    path('cells/<int:area_id>', views.cells, name='cells'),
+    path('cells/<int:area_id>/<slug:target_date>', views.cells, name='cells'),
 
     path('resource/<int:resource_id>', views.resource, name='resource'),
     path('resource/<int:resource_id>/<slug:target_date>', views.resource, name='resource'),

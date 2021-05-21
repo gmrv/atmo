@@ -54,6 +54,7 @@
               <thead>
                 <tr>
                     <th>Ресурс</th>
+                    <th>Тип</th>
                     <th>Площадка</th>
                     <th>Начало</th>
                     <th>Окончание</th>
@@ -69,6 +70,7 @@
                 {% for b in booking %}
                 <tr>
                   <td>{{ b.resource.name }}</td>
+                  <td>{{ b.resource.type }}</td>
                   <td>{{ b.resource.area.name }}</td>
                   <td>{{ b.start_ts }}</td>
                   <td>{{ b.end_ts }}</td>

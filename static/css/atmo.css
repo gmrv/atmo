@@ -72,6 +72,10 @@ a:hover {
     background-color: pink;
 }
 
+.partly {
+    background-color: #ffe6c0;
+}
+
 .free{
     background-color: greenyellow;
 }
@@ -181,4 +185,23 @@ input[type=text]:not(.browser-default):focus:not([readonly]) {
 
 .confirmation-btns {
     display: contents;
+}
+
+body .hinted-hint-bottom-link {
+    display: none;
+}
+
+div .cells-container {
+    display: flex;
+}
+
+div .cell {
+    margin: 1px 1px 1px 1px;
+    padding: 2px 2px 2px 2px;
+    cursor: pointer;
+    color: black;
+}
+
+.cells {
+    fill: blue;
 }

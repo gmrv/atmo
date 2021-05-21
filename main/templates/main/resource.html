@@ -100,7 +100,7 @@
             </div>
 
 
-            <div {% if resource.type == 'seat' %}style="display:none"{% endif %}>
+            <div {% if not resource.type == 'room' %}style="display:none"{% endif %}>
 
               <div class="row valign-wrapper">
                 <div class="input-field col s12">
@@ -245,7 +245,7 @@
     }
 
     function onChangeDatepickerTarget(e){
-      let url = "/main/booking/{{ resource.id }}/" + helper.target_date
+      let url = "/main/resource/{{ resource.id }}/" + helper.target_date
       if (flag){
         window.location.href = url;
       }
