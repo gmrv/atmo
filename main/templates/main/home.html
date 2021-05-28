@@ -50,11 +50,29 @@
       </div>
 
     </div>
+
+<!-- Modal Structure -->
+<div id="modal1" class="modal">
+
+  <a href="#!" class="modal-close waves-effect waves-green btn-flat" ><i class="material-icons">close</i></a>
+  <div class="modal-content center-align">
+    <div class="center-align"><h5>Ячейки хранения</h5></div>
+    <div id="id-modal-body" class="cells-container"></div>
+  </div>
+</div>
 {% endblock %}
 
 {% block extrajs %}
   <script>
+    modalInfo = {};
+
+
+
+
     $(document).ready(function() {
+
+      modalInfo = M.Modal.getInstance($('#modal1'));
+
       let url = "/api/area/" + helper.user_default_area_id + "/" + helper.target_date
       request({url:url, type:'GET', ondone:fillPage})
     });
@@ -94,8 +112,13 @@
       $("#id-cells").addClass('btn')
       $("#id-cells").addClass('cells')
       $("#id-cells").on('click', function (e){
-        let seatId = $(e.currentTarget).data()["id"]
-        window.location.href = '/main/cells/' + helper.user_default_area_id + '/' + helper.target_date;
+
+        //let seatId = $(e.currentTarget).data()["id"]
+        //window.location.href = '/main/cells/' + helper.user_default_area_id + '/' + helper.target_date;
+
+        let url = "/api/area/" + helper.user_default_area_id + "/" + helper.target_date
+        request({url: url, type: 'GET', ondone: drawCells})
+
       })
     }
 
@@ -158,7 +181,32 @@
       }
     }
 
+    function drawCells(response) {
+      let cells = response.result.resources.cells
+      html = ""
+      for (let key in cells) {
+        let classes = "cell btn"
+        if(cells[key].percent_of_booked_time > 80){
+          classes += " booked"
+        } else if(cells[key].percent_of_booked_time > 0){
+          classes += " partly"
+        } else {
+          classes += " free"
+        }
+        html = html + '<div id="id-cell-' + cells[key].id + '" class="' + classes + '">' + cells[key].name + '</div>'
+      }
+      $(".cells-container").html(html)
+      modalInfo.open()
 
+      addHandlers()
+    }
+
+    function addHandlers(){
+      $(".cell").on("click", function(e){
+        let cellId = e.currentTarget.id.split('id-cell-')[1]
+        window.location.href = '/main/resource/' + cellId + '/' + helper.target_date;
+      })
+    }
 
   </script>
 {% endblock %}

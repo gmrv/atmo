@@ -16,7 +16,7 @@
     <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
     <script src="{% static 'js/jquery-ui-1.12.1.min.js' %}"></script>
     <script src="{% static 'js/jquery-ui-1.12.1.min.js' %}"></script>
-    {#<script src="{% static 'js/hinted-ondemand-widget.min.js' %}" organizationId="{% settings_value 'ORGANIZATION_ID' %}"></script>#}
+    <script src="{% static 'js/hinted-ondemand-widget.min.js' %}" organizationId="{% settings_value 'ORGANIZATION_ID' %}"></script>
 
     <!-- Compiled and minified CSS -->
     <link rel="stylesheet" href="{% static 'css/materialize.css' %}">
@@ -70,6 +70,7 @@
             <li><a class="atmo-link" data="/main/profile">Профиль</a></li>
             <li><a class="dropdown-trigger" href="#!" data-target="id-dropdown-areas">Площадки<i class="material-icons right">arrow_drop_down</i></a></li>
             <li></li>
+            <li><a id="id-help" name="id-help" href="#"><i class="material-icons">help_outline</i></a></li>
             <li><a class="atmo-link" data="/main/home"><i class="material-icons">home</i></a></li>
             <li><a href="/tablet/home"><i class="material-icons">tablet</i></a></li>
             <li><a href="/staff/home"><i class="material-icons">build</i></a></li>

@@ -172,3 +172,15 @@ class Command(BaseCommand):
             end_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=19, minute=0, tzinfo=tz),
             event=event3
         )
+        Booking.objects.create(
+            resource=Cell.objects.filter(name='07').first(),
+            user=ivan,
+            start_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=8, minute=0, tzinfo=tz),
+            end_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=19, minute=0, tzinfo=tz)
+        )
+        Booking.objects.create(
+            resource=Cell.objects.filter(name='09').first(),
+            user=ivan,
+            start_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=13, minute=0, tzinfo=tz),
+            end_ts=datetime(year=target_date.year, month=target_date.month, day=target_date.day, hour=14, minute=0, tzinfo=tz)
+        )

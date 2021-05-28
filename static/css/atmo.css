@@ -192,7 +192,7 @@ body .hinted-hint-bottom-link {
 }
 
 div .cells-container {
-    display: flex;
+    display: block;
 }
 
 div .cell {
@@ -204,4 +204,17 @@ div .cell {
 
 .cells {
     fill: blue;
+}
+
+.modal{
+  background-color: white;
+  border-radius: 5px;
+  overflow-y: unset;
+}
+
+.modal .modal-close {
+    cursor: pointer;
+    position: absolute;
+    top: 0px;
+    right: -7px;
 }
